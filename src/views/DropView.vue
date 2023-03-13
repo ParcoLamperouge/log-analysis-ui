@@ -25,7 +25,7 @@ const fileDropped = (e:any) => {
       let str = reader.result || '';
       logStore.setLogData(fileSelect.name, splitFileByLine(str.toString()));
       fileSelected.value = true;
-      router.push({ path: "log"})
+      router.push({ path: "analyze"})
     })
   };
 }
@@ -57,7 +57,7 @@ const getLog = (e:any) => {
       let str = reader.result || '';
       logStore.setLogData(fileSelect.name, splitFileByLine(str.toString()));
       fileSelected.value = true;
-      router.push({ path: "log"})
+      router.push({ path: "analyze"})
     })
   };
 }
@@ -71,13 +71,12 @@ const splitFileByLine = (data:string): string[] => {
 
 <template>
   <div class="dropzone__wrapper" v-if="!fileSelected">
-    
     <div :class="[{active: dropActive}, 'dropzone']" ref="dropzone"
       @drop="fileDropped"
       @dragenter="dragEnter"
       @dragleave="dragLeave"
       @dragover="dragOver">
-      <p class="drop-file-here" >拖拽日志文件到此处, 或者</p>
+      <p class="drop-file-here" >拖拽日志文件到此处, 或者点击</p>
       <input type="file" ref="fileBtn" accept=".log" class="fileBtn" @change="getLog"/>
     </div>
   </div>

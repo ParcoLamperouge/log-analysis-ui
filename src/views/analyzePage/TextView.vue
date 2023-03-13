@@ -1,11 +1,8 @@
 <script lang="ts">
 import { ref } from "vue";
 import { logDataStore, filterStore }from "../../stores/mainStore";
-
-import LogHeader from './Header.vue';
 import { mapState } from 'pinia';
 export default {
-  components: {LogHeader},
   setup() {
     const logStoreIns = logDataStore();
     const filterStoreIns = filterStore();
@@ -34,10 +31,9 @@ export default {
 
 </script>
 <template>
-  <div class="log-view">
-    <LogHeader></LogHeader>
-    <div class="log-view__list">
-      <div class="log-view__item" v-for="(line, i) in showList" :key="i">
+  <div class="text-view">TEXT
+    <div class="text-view__list">
+      <div class="text-view__item" v-for="(line, i) in showList" :key="i">
         {{ line }}
       </div>
     </div>
@@ -45,15 +41,14 @@ export default {
 </template>
 
 <style scoped>
-.log-view{
+.text-view{
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 90vw;
 }
-.log-view__list {
+.text-view__list {
   margin: 10px;
   flex-direction: column;
 }
 </style>
-

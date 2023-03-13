@@ -35,3 +35,11 @@ export const filterStore = defineStore("filter", {
     }
   }
 })
+
+export const viewStore = defineStore("view", {
+  state: () => {
+    return {
+      viewType: "text"
+    }
+  },
+})
