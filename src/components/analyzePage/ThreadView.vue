@@ -4,16 +4,13 @@ import { ElNotification } from 'element-plus';
 import { logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
 import { generateGridData, extractData } from './stringHandle';
-import { getValFromProxy, _throttle } from "../../utils/tools"
+import { getValFromProxy } from "../../utils/tools"
 import OptionTab from '../../components/OptionTab.vue'
-import {
-  ArrowUp,
-  ArrowDown,
-} from '@element-plus/icons-vue'
+
 const SCROLL_TIME = 200;
 const SCROLL_GAP = 10;
 export default defineComponent({
-  components: {OptionTab},
+  components: { OptionTab },
   setup() {
     const dataGrid = ref<any>(null);
     const isInit = ref(true);
@@ -54,14 +51,10 @@ export default defineComponent({
       selectedThreads,
       dataGrid,
       scrollInterval,
-      ArrowUp,
-      ArrowDown
     }
   },
   mounted () {
     this.updateView();
-    this.scrollTopFn = _throttle(this.scrollTop, 1000, false);
-    this.scrollBottomFn = _throttle(this.scrollBottom, 1000, false);
   },
   computed: {
     ...mapState(filterStore, {
@@ -230,7 +223,7 @@ export default defineComponent({
     <div class="thread-view__header"  :style="`zoom: ${zoomSize/100}`">
       <div class="timestamp-left header-timestamp">时间戳</div>
       <div class="header-title header-thread" v-for="(thread, t) in selectedThreads" :key="t">
-        线程：{{thread}}
+        {{showAlias ? '' : "线程："}}{{thread}}
         <input class="header-thread-alias" v-show="showAlias" placeholder="输入别名"/>
       </div>
     </div>

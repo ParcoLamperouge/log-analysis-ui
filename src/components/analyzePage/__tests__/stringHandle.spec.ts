@@ -1,6 +1,6 @@
 import { extractData, generateGridData } from '../stringHandle';
 import { vi, it, expect, describe } from "vitest";
-import type { logDataItem } from '../../../class/logFile';
+import type { LogDataItem } from '../../../class/logFile';
 // dataArr
 const log1 = [
   '[20:53:29.134][I][XEApplication.cpp:72]: [XEApplication::InitContext][tid:39996] ---> 启动客户端程序，verison:3.1.14.0315\r', 
@@ -51,8 +51,8 @@ const result2 = {
   timeStampArray: ["20:53:29.134","20:53:29.165","20:53:29.168","20:53:29.173","20:53:29.181","20:53:29.182","20:53:29.183","20:53:29.186"],
   timeStampArrayShow: ["20:53:29.165","20:53:29.168"]
 }
-let insArr1:logDataItem[] = [];
-let insArr2:logDataItem[] = [];
+let insArr1:LogDataItem[] = [];
+let insArr2:LogDataItem[] = [];
 let selectedThreads1:any[] = [];
 let selectedThreads2:any[] = [];
 describe('extractData', () => {
