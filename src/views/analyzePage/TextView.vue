@@ -21,7 +21,6 @@ export default {
       filterKeyWord: 'customKeyword'
     }),
     showList () {
-      console.log('filterKeyWord ', this.filterKeyWord)
       return this.dataArray.filter((log:string) => {
         return log.indexOf(this.filterKeyWord) > -1
       })

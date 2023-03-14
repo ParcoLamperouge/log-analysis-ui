@@ -2,7 +2,13 @@ import { defineStore } from 'pinia'
 import { logFile } from '../class/logFile'
 
 export const useStore = defineStore("main", {});
-
+export const viewStore = defineStore("view", {
+  state: () => {
+    return {
+      viewType: "text"
+    }
+  },
+})
 const initData:logFile = new logFile();
 export const logDataStore = defineStore("log", {
   state: () => {
@@ -12,8 +18,8 @@ export const logDataStore = defineStore("log", {
     }
   },
   getters: {
-    getLogData: (state) => {
-      state.logFile;
+    getLogData(state): any {
+      return state.logFile.data || [];
     }
   },
   actions: {
@@ -50,10 +56,3 @@ export const filterStore = defineStore("filter", {
   }
 })
 
-export const viewStore = defineStore("view", {
-  state: () => {
-    return {
-      viewType: "text"
-    }
-  },
-})

@@ -1,10 +1,11 @@
 <script lang="ts">
-import { isRef, ref } from "vue";
+import { ref, defineComponent } from "vue";
 import { logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
 import { logDataItem } from '../../class/logFile';
 const THREAD_ID_KEY = 'tid:';
 const MAIN_TEXT_SPLIT_KEY = '--->';
+const THREAD_ARR_DYNAMIC_KEY = 'thread-'
 // 提取所有中括号tag
 const regSplitTag = /(?<=\[)(.+?)(?=\])/g;
 // 仅提取有效字段
@@ -21,7 +22,6 @@ const regThreadWithSquareBracket = /\[tid:(([0-9]+))\]/;
 const regMethodWithSquareBracket = /\[(([\w]+)::([\w]+))\]/;
 const regFileWithSquareBracket = /\[(([\w]+\.cpp):([0-9]+))\]/;
 
-
 function matchDefault(str:string, reg:RegExp, defaultVal:any = "") {
   return str.match(reg) ? str.match(reg)[0] : defaultVal;
 }
@@ -34,23 +34,89 @@ function removeRecognizedTag (str) {
   }) 
   return newStr;
 }
-export default {
+export default defineComponent({
   setup() {
     const logStoreIns = logDataStore();
     const filterStoreIns = filterStore();  
     // 重置筛选项
     filterStoreIns.$reset();
-    let dataArray = ref<any>([]);
+    
     let panelsArray = ref<any>([]);
     let timeStampArray = ref<string[]>([]);
-    const updateFileData = () => {
-      dataArray.value = logStoreIns.logFile.data;
-      return dataArray;
+
+    let drawData = ref<any>({});
+
+    return {
+      logStoreIns,
+      // dataArray,
+       panelsArray,
+      timeStampArray,
+      drawData
     }
-    const convertToClass = (rawArr) => {
+  },
+  mounted () {
+    this.updateView();
+  },
+  computed: {
+    ...mapState(filterStore, {
+      threadIDs: "threadIDs"
+    }),
+    ...mapState(logDataStore, {
+      dropCount: "dropCount",
+    }),
+    ...mapState(logDataStore, {
+      getLogData: "getLogData"
+    }),
+    threadInputArray () {
+      return this.threadIDs.filter(n => !!n)
+    },
+    // 输入了多少个线程名称 - 需要多少个面板
+    threadInputNum () {
+      return this.threadInputArray.length;
+    },
+    threadList () {
+      if (!this.getLogData) {
+        return [];
+      }
+      return this.getLogData.filter((log:string) => {
+        return log.indexOf(THREAD_ID_KEY) > -1
+      })
+    },
+    noThreadList() {
+      if (!this.getLogData) {
+        return [];
+      }
+      return this.getLogData.filter((log:string) => {
+        return log.indexOf(THREAD_ID_KEY) < 0
+      })
+    },
+
+  },
+  watch: {
+    threadInputArray (arr) {
+      if (!Array.isArray(arr)) {
+        return;
+      }
+      this.updateView();
+    },
+    dropCount () {
+      this.updateView();
+    }
+  },
+  methods: {
+    // updateFileData () {
+    //   this.dataArray.value = this.logStoreIns.logFile.data;
+    //   return this.dataArray;
+    // },
+    // 转换为实体类
+    convertToClass (rawArr) {
+      console.log('convertToClass start', rawArr)
+      if (!rawArr) {
+        throw new Error("convertToClass input invalid");
+      } 
       // list 提取 时间戳 去重
       let arr = [];
-      let dataArr = isRef(rawArr) ? rawArr.value : rawArr;
+      let dataArr = JSON.parse(JSON.stringify(rawArr));
       let text = '';
       for (let i = 0; i < dataArr.length; i++) {
         let str = dataArr[i];
@@ -68,7 +134,7 @@ export default {
         let fileName = "";
         let lineNum = 0;
         if (timestamp) {
-          timeStampArray.value.push(timestamp);
+          this.timeStampArray.push(timestamp);
         }
         if (fileTag.length >= 4) {
           // 有效的文件：行号tag
@@ -83,60 +149,61 @@ export default {
         console.log('[ThreadView]', item)
         arr.push(item);
       }
-      console.log('[ThreadView] instance', arr);
-      timeStampArray.value = Array.from(new Set(timeStampArray.value));
-      console.log('[ThreadView] timeStampSet', timeStampArray.value);
+      this.timeStampArray.value = Array.from(new Set(this.timeStampArray.value));
       return arr;
-    }
-    return {
-      logStoreIns,
-      dataArray, panelsArray,
-      timeStampArray,
-      updateFileData,
-      convertToClass
-    }
-  },
-  mounted () {
-    this.convertToClass(this.updateFileData());
-  },
-  computed: {
-    ...mapState(filterStore, {
-      threadIDs: "threadIDs"
-    }),
-    ...mapState(logDataStore, {
-      dropCount: "dropCount"
-    }),
-    threadInputArray () {
-      return this.threadIDs.filter(n => !!n)
     },
-    // 输入了多少个线程名称 - 需要多少个面板
-    threadInputNum () {
-      return this.threadInputArray.length;
-    },
-    threadList () {
-      return this.dataArray.filter((log:string) => {
-        return log.indexOf(THREAD_ID_KEY) > -1
-      })
-    },
-    noThreadList() {
-      return this.dataArray.filter((log:string) => {
-        return log.indexOf(THREAD_ID_KEY) < 0
-      })
-    },
-
-  },
-  watch: {
-    threadInputArray (arr) {
-      if (!Array.isArray(arr)) {
+    generateGridData (instanceArr:logDataItem[]) {
+      console.log('generateGridData start', instanceArr)
+      // 时间轴（纵轴）
+      if (this.timeStampArray.value.length < 0 ) {
         return;
       }
-      this.convertToClass(this.updateFileData());
+      // 预先生成好容器
+      let rowTemplate = {
+      }
+      // 根据有效线程数 (横轴)，动态分配
+      this.threadInputArray.forEach((e) => {
+        rowTemplate[e] = [];
+      });
+      // 最终数据输出容器
+      let rowMap = {};
+
+      // 数据分发 - 生成时间轴
+      let timestampArr = JSON.parse(JSON.stringify(this.timeStampArray));
+      timestampArr.forEach(t => {
+        let dataObj = Object.assign({}, rowTemplate);
+        rowMap[t] = dataObj;
+      });
+      /*
+      rowMap format = {
+        '12:00:00.000': {
+          thread1: [],
+          thread2: [],
+          thread3: []
+        }
+      }
+      */
+      instanceArr.forEach((ins:logDataItem, i) => {
+        let timestamp = ins.timestamp;
+        let threadID = ins.threadID;
+        let curObj = rowMap[timestamp];
+        if (!threadID) {
+          threadID = 'other';
+        }
+        if (!curObj[threadID]) {
+          curObj[threadID] = []
+        }
+        curObj[threadID].push(ins);
+      })
+      console.log('format data', rowMap);
+      this.drawData = rowMap;
+      return rowMap;
     },
-    dropCount () {
-      this.convertToClass(this.updateFileData());
+    updateView () {
+      this.generateGridData(this.convertToClass(this.getLogData));
     }
   }
-}
+})
 
 </script>
 <template>
