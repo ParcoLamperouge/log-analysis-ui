@@ -2,9 +2,15 @@ export class logFile {
     fileName: string = "";
     data: string[] = [];
 }
+// const levelMap = {
+//     I: 'info',
+//     W: 'warning',
+//     E: 'error'
+// }
 export class logDataItem {
     private id: number;
     private rawString: string;
+    // private bgClass: string;
 
     // TODO 临时使用public ，快速迭代
     public timestamp: string;

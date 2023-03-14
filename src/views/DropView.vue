@@ -111,13 +111,12 @@ export default {
 .dropzone {
   left: 0;
   top: 0;
-  width: 80%;
-  height: 80%;
   border-radius: 20px;
   border: 3px dashed black;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20%;
   > p.drop-file-here {
     font-size: 30px;
   }
@@ -126,8 +125,7 @@ export default {
   }
   &.dropzone-bg {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    padding: 0;
     border: none;
   }
 }
