@@ -31,7 +31,7 @@ export default {
 
 </script>
 <template>
-  <div class="text-view">TEXT
+  <div class="text-view">
     <div class="text-view__list">
       <div class="text-view__item" v-for="(line, i) in showList" :key="i">
         {{ line }}

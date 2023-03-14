@@ -18,10 +18,19 @@ export default {
       dataArray, logStoreIns, 
     }
   },
-  mounted () {   
-    this.dataArray  = this.logStoreIns.logFile.data;
+  mounted () {
+    this.dataArray = this.logStoreIns.logFile.data;
+  },
+  watch: {
+    // TODO 文件更新没做好
+    dropCount () {
+      // this.dataArray = file.data;
+    }
   },
   computed: {
+    ...mapState(logDataStore, {
+      dropCount: "dropCount"
+    }),
     ...mapState(filterStore, {
       filterKeyWord: 'customKeyword'
     }),
@@ -48,6 +57,7 @@ export default {
 
 <style scoped>
 .analyze{
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100vh;

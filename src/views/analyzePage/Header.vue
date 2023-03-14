@@ -42,11 +42,6 @@ export default {
 </script>
 <template>
   <div class="log-view__header">
-    <div class="back-home">
-      <el-button>
-      <router-link to="/">home</router-link>
-    </el-button>
-    </div>
     <div class="view-selector">
       <span class="view-selector__span">视图选择</span>
       <el-select v-model="viewType" class="m-2" @change="switchView">

@@ -7,7 +7,8 @@ const initData:logFile = new logFile();
 export const logDataStore = defineStore("log", {
   state: () => {
     return {
-      logFile: initData
+      logFile: initData,
+      dropCount: 0
     }
   },
   getters: {
@@ -17,6 +18,7 @@ export const logDataStore = defineStore("log", {
   },
   actions: {
     setLogData(fileName:string, data:string[]) {
+      this.dropCount++;
       this.logFile.fileName = fileName;
       this.logFile.data = data
     }
