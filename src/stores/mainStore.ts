@@ -26,12 +26,24 @@ export const logDataStore = defineStore("log", {
 export const filterStore = defineStore("filter", {
   state: () => {
     return {
-      customKeyWord: ""
+      customKeyword: "",
+      threadIDs: Array(5)
     }
   },
   getters: {
     getCustomKeyWord: (state) => {
-      state.customKeyWord
+      state.customKeyword
+    }
+  },
+  actions: {
+    setThreadID(threadNum:number, threadId:string) {
+      if (threadNum < 0 || threadNum > 4) {
+        return;
+      }
+      this.threadIDs[threadNum] = threadId;
+    },
+    emptyThreadIDs() {
+      this.threadIDs = new Array(5);
     }
   }
 })

@@ -1,8 +1,10 @@
 <script lang="ts">
-import { ref } from 'vue';
+import { ref, getCurrentInstance } from 'vue';
 import { filterStore, viewStore } from "../../stores/mainStore"
 import { ViewTypes } from "../../utils/enum"
+import ThreadFilter from './ThreadFilter.vue';
 export default {
+  components: {ThreadFilter},
   setup(){
     const insFilterStore = filterStore();
     const insViewStore = viewStore();
@@ -10,10 +12,14 @@ export default {
     let viewType = ref(ViewTypes.Text);
     const inputFilter = (keyword:string) => {
       input.value = keyword
-      insFilterStore.customKeyWord = keyword
+      insFilterStore.customKeyword = keyword
     }
     const switchView = (view:any) => {
       insViewStore.viewType = view
+    }
+
+    const emptyThreads = () => {
+      insFilterStore.emptyThreadIDs();
     }
     const viewOptions = [
       {
@@ -28,7 +34,7 @@ export default {
       insFilterStore,
       input, viewType, 
       viewOptions,
-      inputFilter, switchView,
+      inputFilter, switchView, emptyThreads
       
     }
   }
@@ -56,9 +62,13 @@ export default {
       <span class="keyword-filter__span">筛选：</span>
       <el-input class="w-50 m-2" v-model="input" placeholder="Please input" @change="inputFilter" @input="inputFilter"/>
     </div>
+    <div class="thread-options" v-if="viewType ==='thread' ">
+      <thread-filter :ref="`thread-filter-${index}`" v-for="(i,index) in Array(5)" :key="index" :threadNum="index"></thread-filter>
+      <el-button @click="emptyThreads">reset</el-button>
+    </div>
   </div>
 </template>
-<style scoped>
+<style scoped lang="scss">
 .log-view__header{
   /* display: grid; */
   /* grid-template-columns: 100px 400px 400px 400px; */
@@ -67,10 +77,11 @@ export default {
   display: flex;
   flex-direction: row;
   padding: 10px;
-}
-.back-home {
-  height: 40px;
-  line-height: 40px;
+
+  .back-home {
+    height: 40px;
+    line-height: 40px;
+  }
 }
 .keyword-filter {
   margin-left: 20px;
@@ -84,5 +95,9 @@ span {
   height: 40px;
   line-height: 40px;
   padding: 5px;
+}
+.thread-options {
+  display: flex;
+  flex-direction: row;
 }
 </style>

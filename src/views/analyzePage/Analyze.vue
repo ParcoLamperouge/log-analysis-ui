@@ -18,12 +18,12 @@ export default {
       dataArray, logStoreIns, 
     }
   },
-  mounted () {
-    this.dataArray = this.logStoreIns.logFile.data;
+  mounted () {   
+    this.dataArray  = this.logStoreIns.logFile.data;
   },
   computed: {
     ...mapState(filterStore, {
-      filterKeyWord: 'customKeyWord'
+      filterKeyWord: 'customKeyword'
     }),
     ...mapState(viewStore, {
       viewType: 'viewType'
@@ -51,6 +51,5 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: 90vw;
 }
 </style>

@@ -18,7 +18,7 @@ export default {
   },
   computed: {
     ...mapState(filterStore, {
-      filterKeyWord: 'customKeyWord'
+      filterKeyWord: 'customKeyword'
     }),
     showList () {
       console.log('filterKeyWord ', this.filterKeyWord)
