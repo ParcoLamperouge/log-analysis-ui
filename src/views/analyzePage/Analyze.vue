@@ -41,8 +41,8 @@ export default {
 <template>
   <div class="analyze">
     <LogHeader></LogHeader>
-    <TextView v-show="viewType === 'text'"></TextView>
-    <ThreadView v-show="viewType === 'thread'"></ThreadView>
+    <TextView v-if="viewType === 'text'"></TextView>
+    <ThreadView v-if="viewType === 'thread'"></ThreadView>
   </div>
 </template>
 
