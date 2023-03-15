@@ -3,7 +3,7 @@ import { ref, nextTick} from "vue";
 import { logDataStore } from "../stores/mainStore";
 import AnalyzePage from './analyzePage/Analyze.vue';
 export default {
-  components: {AnalyzePage},
+  components: { AnalyzePage },
   setup() {
     const logStore = logDataStore();
     let fileSelected = ref(false);
@@ -84,14 +84,14 @@ export default {
       </div>
     </template>
     <template v-if="fileSelected">
-      <div :class="[{active: dropActive}, 'dropzone', 'dropzone-bg']" ref="dropzone"
+      <AnalyzePage></AnalyzePage>
+      <!-- <div :class="[{active: dropActive}, 'dropzone', 'dropzone-bg']" ref="dropzone"
         @drop="fileDropped"
         @dragenter="dragEnter"
         @dragleave="dragLeave"
         @dragover="dragOver">
-        <p class="drop-file-here" v-show="dropActive">释放以更新</p>
-        <AnalyzePage></AnalyzePage>
-      </div>
+        <div class="drop-file-here" v-if="dropActive">释放以更新</div>
+      </div> -->
     </template>
     
   </div>
@@ -109,8 +109,6 @@ export default {
 }
 
 .dropzone {
-  left: 0;
-  top: 0;
   border-radius: 20px;
   border: 3px dashed black;
   display: flex;
@@ -123,11 +121,19 @@ export default {
   &.active {
     background-color: rgba(0, 0, 0, 0.2)
   }
-  &.dropzone-bg {
-    position: absolute;
-    padding: 0;
-    border: none;
-  }
+  // &.dropzone-bg {
+  //   position: absolute;
+  //   border: none;
+  //   border-radius: 0;
+  //   display: flex;
+  //   justify-content: center;
+  //   align-items: center;
+  //   > .drop-file-here {
+  //     top: 50%;
+  //     left: 50%;
+  //     transform: translate(-50%, -50%);
+  //   }
+  // }
 }
 </style>
 

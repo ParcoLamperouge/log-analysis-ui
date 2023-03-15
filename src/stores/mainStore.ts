@@ -18,6 +18,9 @@ export const logDataStore = defineStore("log", {
     }
   },
   getters: {
+    getLogFileName(state): any {
+      return state.logFile.fileName || '';
+    },
     getLogData(state): any {
       return state.logFile.data || [];
     }

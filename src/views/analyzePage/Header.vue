@@ -1,10 +1,11 @@
 <script lang="ts">
-import { ref, getCurrentInstance } from 'vue';
-import { filterStore, viewStore } from "../../stores/mainStore"
+import { ref } from 'vue';
+import { logDataStore, filterStore, viewStore } from "../../stores/mainStore"
+import { mapState } from "pinia";
 import { ViewTypes } from "../../utils/enum"
-import ThreadFilter from './ThreadFilter.vue';
+// import ThreadFilter from './ThreadFilter.vue';
 export default {
-  components: {ThreadFilter},
+  // components: { ThreadFilter },
   setup(){
     const insFilterStore = filterStore();
     const insViewStore = viewStore();
@@ -35,13 +36,18 @@ export default {
       input, viewType, 
       viewOptions,
       inputFilter, switchView, emptyThreads
-      
     }
+  },
+  computed: {
+    ...mapState(logDataStore, {
+      getLogFileName: 'getLogFileName'
+    })
   }
 }
 </script>
 <template>
   <div class="log-view__header">
+    <div> 日志名称： {{ getLogFileName }} </div>
     <div class="view-selector">
       <span class="view-selector__span">视图选择</span>
       <el-select v-model="viewType" class="m-2" @change="switchView">
@@ -57,10 +63,10 @@ export default {
       <span class="keyword-filter__span">筛选：</span>
       <el-input class="w-50 m-2" v-model="input" placeholder="Please input" @change="inputFilter" @input="inputFilter"/>
     </div>
-    <div class="thread-options" v-if="viewType ==='thread' ">
+    <!-- <div class="thread-options" v-if="viewType ==='thread' ">
       <thread-filter :ref="`thread-filter-${index}`" v-for="(i,index) in Array(5)" :key="index" :threadNum="index"></thread-filter>
       <el-button @click="emptyThreads">reset</el-button>
-    </div>
+    </div> -->
   </div>
 </template>
 <style scoped lang="scss">

@@ -14,16 +14,29 @@ export default {
     }
   },
   mounted () {
-    this.dataArray = this.logStoreIns.logFile.data;
+    this.updateView();
   },
   computed: {
     ...mapState(filterStore, {
       filterKeyWord: 'customKeyword'
     }),
+    ...mapState(logDataStore, {
+      dropCount: "dropCount",
+    }),
     showList () {
       return this.dataArray.filter((log:string) => {
         return log.indexOf(this.filterKeyWord) > -1
       })
+    }
+  },
+  watch: {
+    dropCount () {
+      this.updateView();
+    }
+  },
+  methods: {
+    updateView () {
+      this.dataArray = this.logStoreIns.logFile.data;
     }
   }
 }

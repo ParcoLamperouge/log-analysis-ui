@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import DropView from '../views/DropView.vue';
+import HomeView from '../views/HomeView.vue';
 import Analyze from '../views/analyzePage/Analyze.vue'
 
 const router = createRouter({
@@ -8,7 +8,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: DropView
+      component: HomeView
     },
     {
       path: '/analyze',
