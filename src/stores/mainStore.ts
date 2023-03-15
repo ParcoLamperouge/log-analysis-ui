@@ -38,7 +38,11 @@ export const filterStore = defineStore("filter", {
   state: () => {
     return {
       customKeyword: "",
-      threadIDs: Array(5)
+      threadIDs: Array(5),
+      // tag开关
+      fileNameSwitch: true,
+      methodNameSwitch: true,
+      mainTextSwitch: true
     }
   },
   getters: {

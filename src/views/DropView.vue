@@ -1,12 +1,12 @@
 <script lang="ts">
 import { ref, nextTick} from "vue";
 import { logDataStore } from "../stores/mainStore";
-import AnalyzePage from './analyzePage/Analyze.vue';
 export default {
-  components: { AnalyzePage },
+  props: {
+    size: String
+  },
   setup() {
     const logStore = logDataStore();
-    let fileSelected = ref(false);
     let dropActive = ref(false);
     const fileDropped = (e:any) => {
       e.stopPropagation();
@@ -21,7 +21,6 @@ export default {
         nextTick(() => {
           let str = reader.result || '';
           logStore.setLogData(fileSelect.name, splitFileByLine(str.toString()));
-          fileSelected.value = true;
         })
       };
     }
@@ -53,7 +52,6 @@ export default {
         nextTick(() => {
           let str = reader.result || '';
           logStore.setLogData(fileSelect.name, splitFileByLine(str.toString()));
-          fileSelected.value = true;
         })
       };
     }
@@ -63,55 +61,60 @@ export default {
       return result;
     }
 
-    return {fileSelected, dropActive,
+    return {dropActive,
     fileDropped, dragEnter, dragLeave, dragOver,
     getLog, splitFileByLine}
   }
 }
-
 </script>
 
 <template>
-  <div class="home-view__wrapper">
-    <template v-if="!fileSelected">  
-      <div :class="[{active: dropActive}, 'dropzone']" ref="dropzone"
-        @drop="fileDropped"
-        @dragenter="dragEnter"
-        @dragleave="dragLeave"
-        @dragover="dragOver">
-        <p class="drop-file-here" >拖拽日志文件到此处, 或者点击</p>
-        <input type="file" ref="fileBtn" accept=".log" class="fileBtn" @change="getLog"/>
-      </div>
-    </template>
-    <template v-if="fileSelected">
-      <AnalyzePage></AnalyzePage>
-    </template>
+  <div :class="['dropzone__wrapper', size]">
+    <div :class="[{active: dropActive}, 'dropzone']" ref="dropzone"
+      @drop="fileDropped"
+      @dragenter="dragEnter"
+      @dragleave="dragLeave"
+      @dragover="dragOver">
+      <p class="drop-file-here" >拖拽日志文件到此处, 或者点击</p>
+      <input type="file" ref="fileBtn" accept=".log" class="fileBtn" @change="getLog"/>
+    </div> 
   </div>
 </template>
 
 <style scoped lang="scss">
-.home-view__wrapper {
-  width: 100vw;
-  height: 100vh;
-  padding: 20px;
-  background: transparent;
+.dropzone__wrapper {
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.dropzone {
-  border-radius: 20px;
-  border: 3px dashed black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20%;
-  > p.drop-file-here {
-    font-size: 30px;
+  .dropzone {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &.active {
+      background-color: rgba(0, 0, 0, 0.2)
+    }
   }
-  &.active {
-    background-color: rgba(0, 0, 0, 0.2)
+  &.large {
+    .dropzone {
+      border-radius: 20px;
+      border: 3px dashed black;
+    }
+    .dropzone > p.drop-file-here {
+      font-size: 30px;
+    }
+  }
+  &.small {
+    .dropzone {
+      height: 60px;
+      border-radius: 8px;
+      padding: 5px;
+      border: 1px dashed black;
+    }
+    .dropzone > p.drop-file-here {
+      font-size: 14px;
+    }
   }
 }
 </style>
