@@ -5,7 +5,7 @@ import { logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
 import reg from './regExp';
 import { logDataItem } from '../../class/logFile';
-import { getValFromProxy, deepClone, deDuplicate } from "../../utils/tools"
+import { getValFromProxy, deepClone } from "../../utils/tools"
 import OptionTab from '../../components/OptionTab.vue'
 const THREAD_ID_KEY = 'tid:';
 const MAIN_TEXT_SPLIT_KEY = '--->';
@@ -33,6 +33,11 @@ export default defineComponent({
   setup() {
     const isInit = ref(true);
     const showAlias = ref(false);
+
+    const loading = ref(false);
+    const showLoading = ref(false);
+    const loadingTimeout = ref(0);
+
     const logStoreIns = logDataStore();
     const filterStoreIns = filterStore();
     
@@ -48,6 +53,9 @@ export default defineComponent({
     return {
       isInit,
       showAlias,
+      loading,
+      showLoading,
+      loadingTimeout,
       logStoreIns,
       panelsArray,
       timeStampArray,
@@ -100,12 +108,25 @@ export default defineComponent({
         type: 'success',
         'show-close': false
       })
+      this.isInit = true;
+      this.selectedThreads = [];
       this.updateView();
     },
+    loading (curVal, preVal) {
+      this.loadingTimeout = clearTimeout(this.loadingTimeout);
+      this.loadingTimeout = setTimeout(() => {
+        this.showLoading = true;
+        setTimeout(() => {
+          this.showLoading = false;
+        }, 1000);
+      }, 10)
+    }
   },
   methods: {
     changeThreads () {
+      this.loading = true;
       this.generateGridData(this.convertToClass(this.getLogData));
+      this.loading = false;
     },
     // 转换为实体类
     convertToClass (rawArr) {
@@ -120,6 +141,7 @@ export default defineComponent({
 
       // 初始化线程名集合
       let threadSet = new Set();
+      let timestampSet = new Set();
       for (let i = 0; i < dataArr.length; i++) {
         let str = dataArr[i];
         // 初始化正文
@@ -144,7 +166,7 @@ export default defineComponent({
         let fileName = "";
         let lineNum = 0;
         if (timestamp) {
-          this.timeStampArray.push(timestamp);
+          timestampSet.add(timestamp);
         }
         if (fileTag.length >= 4) {
           // 有效的文件：行号tag
@@ -161,7 +183,6 @@ export default defineComponent({
         if (item.timestamp.length < 1) {
           break;
         }
-        
         arr.push(item);
       }
       // 排序
@@ -171,10 +192,10 @@ export default defineComponent({
       this.allThreadIDArray = sorted;
       // 初始化，线程全选
       if (this.isInit) {
-        this.selectedThreads = Array.from(sorted);
         this.isInit = false;
+        this.selectedThreads = Array.from(sorted.slice(0, 5));
       }
-      this.timeStampArray.value = deDuplicate(getValFromProxy(this.timeStampArray));
+      this.timeStampArray = Array.from(timestampSet);
       return arr;
     },
     generateGridData (instanceArr:logDataItem[]) {
@@ -277,7 +298,7 @@ export default defineComponent({
         <!-- <div class="alias-editable" v-show="showAlias" contenteditable="true" aria-placeholder="输入别名"></div> -->
       </div>
     </div>
-    <div class="thread-view__panel">
+    <div class="thread-view__panel" v-loading="showLoading">
       <div class="row" v-for="(timestamp, i) in timeStampArray" :key="i">
         <div class="timestamp-left">{{timestamp}}</div>
         <div class="lines-right column" v-for="(lines, j) in drawData[timestamp]" :key="j">
@@ -429,7 +450,7 @@ $header-height: 40px;
       .item-params {
         padding: 0 5px;
         border-radius: 5px;
-        margin: 5px 5px 0 0;
+        margin: 3px;
         line-height: 30px;
         &.file-name {
           background-color: $warning;
