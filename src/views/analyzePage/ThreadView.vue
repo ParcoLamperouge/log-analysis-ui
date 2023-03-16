@@ -398,7 +398,7 @@ $header-height: 40px;
 
   .timestamp-left {
     width: 120px;
-    overflow: hidden scroll;
+    overflow: hidden auto;
     border-color: $line;
     display: flex;
     justify-content: center;
