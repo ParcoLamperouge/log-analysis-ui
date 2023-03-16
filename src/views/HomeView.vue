@@ -80,7 +80,7 @@ export default {
         @dragleave="dragLeave"
         @dragover="dragOver">
         <p class="drop-file-here" >拖拽日志文件到此处, 或者点击</p>
-        <input type="file" ref="fileBtn" accept=".log" class="fileBtn" @change="getLog"/>
+        <input type="file" ref="fileBtn" accept=".log" class="file-btn" @change="getLog"/>
       </div>
     </template>
     <template v-if="fileSelected">
@@ -90,7 +90,10 @@ export default {
 </template>
 
 <style scoped lang="scss">
+@import "src/assets/colors.scss";
 .home-view__wrapper {
+  background: $bg !important;
+  color: #000000 !important;
   width: 100vw;
   height: 100vh;
   padding: 20px;
@@ -107,6 +110,9 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 20%;
+  .file-btn {
+    margin-left: 10px;
+  }
   > p.drop-file-here {
     font-size: 30px;
   }

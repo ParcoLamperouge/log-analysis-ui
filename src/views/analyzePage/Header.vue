@@ -46,7 +46,7 @@ export default {
   <div class="log-view__header">
     <div class="grid-item"> 日志名称: {{ getLogFileName }} </div>
     <div class="grid-item view-selector">
-      <span class="">视图选择:</span>
+      <span class="">视图:</span>
       <el-select v-model="viewType" class="m-2" @change="switchView">
         <el-option 
           v-for="item in viewOptions"
@@ -72,13 +72,15 @@ export default {
   grid-gap: 20px;
   padding: 10px 0;
   .grid-item {
-    padding: 0 5px;
+    padding: 0 10px;
     font-size: 16px;
     line-height: 60px;
     background: $bg3;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+  .view-selector > span {
   }
   .back-home {
     height: 40px;

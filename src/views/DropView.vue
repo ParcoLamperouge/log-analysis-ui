@@ -76,7 +76,7 @@ export default {
       @dragleave="dragLeave"
       @dragover="dragOver">
       <p class="drop-file-here" >拖拽日志文件到此处, 或者点击</p>
-      <input type="file" ref="fileBtn" accept=".log" class="fileBtn" @change="getLog"/>
+      <input type="file" ref="fileBtn" accept=".log" class="file-btn" @change="getLog"/>
     </div> 
   </div>
 </template>
@@ -92,6 +92,9 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    .file-btn {
+      margin-left: 10px;
+    }
     &.active {
       background-color: rgba(0, 0, 0, 0.2)
     }

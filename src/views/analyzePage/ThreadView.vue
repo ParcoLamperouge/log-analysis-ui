@@ -312,7 +312,7 @@ $header-height: 40px;
   overflow: hidden auto;
   display: flex;
   flex-direction: column;
-  flex:1;
+  flex: 1;
   .thread-view-filter__grid {
     display: grid;
     grid-template-columns: 360px 120px 1fr;
