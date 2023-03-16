@@ -51,8 +51,8 @@ export const filterStore = defineStore("filter", {
     }
   },
   actions: {
-    setThreadID(threadNum:number, threadId:string) {
-      if (threadNum < 0 || threadNum > 4) {
+    setThreadID(threadNum:number|undefined, threadId:string) {
+      if (!threadNum || threadNum < 0 || threadNum > 4) {
         return;
       }
       this.threadIDs[threadNum] = threadId;

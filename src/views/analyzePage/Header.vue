@@ -4,9 +4,8 @@ import { logDataStore, filterStore, viewStore } from "../../stores/mainStore"
 import { mapState } from "pinia";
 import { ViewTypes } from "../../utils/enum"
 import DropView from "../DropView.vue"
-// import ThreadFilter from './ThreadFilter.vue';
 export default {
-  components: { DropView }, //ThreadFilter
+  components: { DropView },
   setup(){
     const insViewStore = viewStore();
     const insFilterStore = filterStore();
@@ -49,18 +48,14 @@ export default {
       <span class="">视图:</span>
       <el-select v-model="viewType" class="m-2" @change="switchView">
         <el-option 
-          v-for="item in viewOptions"
-          :key="item.key"
+          v-for="(item, key) in viewOptions"
+          :key="key"
           :value="item.value"
           :label="item.label"
         />
       </el-select>
     </div>
-    <DropView :size="'small'"></DropView>
-    <!-- <div class="thread-options" v-if="viewType ==='thread' ">
-      <thread-filter :ref="`thread-filter-${index}`" v-for="(i,index) in Array(5)" :key="index" :threadNum="index"></thread-filter>
-      <el-button @click="emptyThreads">reset</el-button>
-    </div> -->
+    <drop-view :size="'small'"></drop-view>
   </div>
 </template>
 <style scoped lang="scss">

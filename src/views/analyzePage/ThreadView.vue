@@ -11,7 +11,12 @@ const THREAD_ID_KEY = 'tid:';
 const MAIN_TEXT_SPLIT_KEY = '--->';
 
 function matchDefault(str:string, reg:RegExp, defaultVal:any = "") {
-  return str.match(reg) ? str.match(reg)[0] : defaultVal;
+  const matchResult:any = str.match(reg);
+  if (!matchResult || matchResult.length <= 0) {
+    return defaultVal;
+  } else {
+    return matchResult[0];
+  }
 }
 // 将已经识别的tag从字符串中移除
 function removeRecognizedTag (str:string) {
@@ -46,10 +51,10 @@ export default defineComponent({
     
     // 重置筛选项
     filterStoreIns.$reset();
-    const selectedThreads = reactive([]);
+    const selectedThreads = ref<any[]>([]);
     
     let panelsArray = ref<any>([]);
-    let timeStampArray = ref<string[]>([]);
+    let timeStampArray = ref<any[]>([]);
     let allThreadIDArray = ref<string[]>([]);
     let drawData = ref<any>({});
 
@@ -85,9 +90,6 @@ export default defineComponent({
     ...mapState(logDataStore, {
       getLogData: "getLogData"
     }),
-    threadInputArray () {
-      return this.threadIDs.filter(n => !!n)
-    },
     threadList () {
       if (!this.getLogData) {
         return [];
@@ -107,24 +109,25 @@ export default defineComponent({
   },
   watch: {
     dropCount () {
-      ElNotification({
+      const option:any = {
         title: "日志更新",
         type: 'success',
         'show-close': false
-      })
+      }
+      ElNotification(option);
       this.isInit = true;
       this.selectedThreads = [];
       this.updateView();
     },
-    loading (curVal, preVal) {
-      this.loadingTimeout = clearTimeout(this.loadingTimeout);
-      this.loadingTimeout = setTimeout(() => {
-        this.showLoading = true;
-        setTimeout(() => {
-          this.showLoading = false;
-        }, 1000);
-      }, 10)
-    }
+    // loading (curVal, preVal) {
+    //   this.loadingTimeout = clearTimeout(this.loadingTimeout);
+    //   this.loadingTimeout = setTimeout(() => {
+    //     this.showLoading = true;
+    //     setTimeout(() => {
+    //       this.showLoading = false;
+    //     }, 1000);
+    //   }, 10)
+    // }
   },
   methods: {
     changeThreads () {
@@ -133,7 +136,7 @@ export default defineComponent({
       this.loading = false;
     },
     // 转换为实体类
-    convertToClass (rawArr) {
+    convertToClass (rawArr:any) {
       if (!rawArr) {
         throw new Error("convertToClass input invalid");
       }
@@ -190,7 +193,8 @@ export default defineComponent({
         arr.push(item);
       }
       // 排序
-      let sorted = Array.from(threadSet).sort((a:number, b: number) => a - b);
+      let sortFn:any = (a:number, b: number) => a - b;
+      let sorted:any[] = Array.from(threadSet).sort(sortFn);
       sorted.push('other')
       console.log("allThreadIDArray sorted", sorted);
       this.allThreadIDArray = sorted;
@@ -208,19 +212,18 @@ export default defineComponent({
         return;
       }
       // 预先生成好容器
-      let rowTemplate = {
-      }
+      let rowTemplate:any = {}
       // 根据有效线程数 (横轴)，动态分配
       this.selectedThreads.forEach((e) => {
         rowTemplate[e] = [];
       });
       console.log("allThreadIDArray", this.allThreadIDArray)
       // 最终数据输出容器
-      let rowMap = {};
+      let rowMap:any = {};
 
       // 数据分发 - 生成时间轴
       let timestampArr = getValFromProxy(this.timeStampArray);
-      timestampArr.forEach(t => {
+      timestampArr.forEach((t:string) => {
         let dataObj = deepClone(rowTemplate);
         rowMap[t] = dataObj;
       });
@@ -245,8 +248,8 @@ export default defineComponent({
         }
       })
       // 线程筛选后，如果一行数据没有任何数据，该行不展示
-      let output = {};
-      let filterTimestamp = [];
+      let output:any = {};
+      let filterTimestamp:string[] = [];
       Object.keys(rowMap).forEach((k) => {
         let values = Object.values(rowMap[k]).flat();
         if (values.length > 0) {
@@ -261,7 +264,7 @@ export default defineComponent({
     },
     updateView () {
       this.timeStampArray = [];
-      this.allThreadIDArray.value = [];
+      this.allThreadIDArray = [];
       this.generateGridData(this.convertToClass(this.getLogData));
     }
   }

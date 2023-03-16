@@ -1,6 +1,6 @@
 <script lang="ts">
 import { ref } from "vue";
-import { logDataStore, filterStore, viewStore }from "../../stores/mainStore";
+import { logDataStore, viewStore }from "../../stores/mainStore";
 import LogHeader from './Header.vue';
 import TextView from './TextView.vue';
 import ThreadView from './ThreadView.vue';
@@ -9,10 +9,6 @@ export default {
   components: {LogHeader, TextView, ThreadView},
   setup() {
     const logStoreIns = logDataStore();
-    const filterStoreIns = filterStore();
-    // const insViewStore = viewStore();
-    // 重置筛选项
-    filterStoreIns.$reset();
     let dataArray = ref<string[]>([]);
     return {
       dataArray, logStoreIns, 
@@ -31,18 +27,9 @@ export default {
     ...mapState(logDataStore, {
       dropCount: "dropCount"
     }),
-    ...mapState(filterStore, {
-      filterKeyWord: 'customKeyword'
-    }),
     ...mapState(viewStore, {
       viewType: 'viewType'
     }),
-    showList () {
-      console.log('filterKeyWord ', this.filterKeyWord)
-      return this.dataArray.filter((log:string) => {
-        return log.indexOf(this.filterKeyWord) > -1
-      })
-    }
   }
 }
 

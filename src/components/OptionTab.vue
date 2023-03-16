@@ -9,7 +9,7 @@ export default {
     colorType: String
   },
   setup() {
-    const filterStoreIns =  filterStore();
+    const filterStoreIns:any =  filterStore();
     let active = ref(true);
     return {
       active,filterStoreIns
