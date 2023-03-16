@@ -1,5 +1,6 @@
 <script lang="ts">
-import { ref, reactive, defineComponent } from "vue";
+import { ref, reactive, defineComponent, h } from "vue";
+import { ElNotification } from 'element-plus';
 import { logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
 import reg from './regExp';
@@ -31,6 +32,7 @@ export default defineComponent({
   components: {OptionTab},
   setup() {
     const isInit = ref(true);
+    const showAlias = ref(false);
     const logStoreIns = logDataStore();
     const filterStoreIns = filterStore();
     
@@ -40,11 +42,12 @@ export default defineComponent({
     
     let panelsArray = ref<any>([]);
     let timeStampArray = ref<string[]>([]);
-    let allThreadIDArray = reactive<string[]>([]);
+    let allThreadIDArray = ref<string[]>([]);
     let drawData = ref<any>({});
 
     return {
       isInit,
+      showAlias,
       logStoreIns,
       panelsArray,
       timeStampArray,
@@ -91,13 +94,12 @@ export default defineComponent({
     },
   },
   watch: {
-    threadInputArray (arr) {
-      if (!Array.isArray(arr)) {
-        return;
-      }
-      this.updateView();
-    },
     dropCount () {
+      ElNotification({
+        title: "日志更新",
+        type: 'success',
+        'show-close': false
+      })
       this.updateView();
     },
   },
@@ -115,19 +117,22 @@ export default defineComponent({
       let dataArr = getValFromProxy(rawArr);
 
       console.log("convertToClass", dataArr.length)
-      let text = '';
+
+      // 初始化线程名集合
+      let threadSet = new Set();
       for (let i = 0; i < dataArr.length; i++) {
         let str = dataArr[i];
-        
+        // 初始化正文
+        let mainText = '';
         // 按分割符，切分tag区域和正文区域, 
         if (str.indexOf(MAIN_TEXT_SPLIT_KEY) > -1) {
           let strSplitArr = str.split(MAIN_TEXT_SPLIT_KEY);
           str = strSplitArr[0];
-          text = strSplitArr[1].trim();
+          mainText = strSplitArr[1].trim();
         } 
         // 如果没有，则认为是非业务日志，去掉方括号的部分视为正文
         else {
-          text = removeRecognizedTag(str).trim();
+          mainText = removeRecognizedTag(str).trim();
           // let unrecognizedTags = matchDefault(str, reg.regSplitTag);
           // TODO 呈现第三方tag
           // console.log("unrecognizedTags", unrecognizedTags);
@@ -148,24 +153,28 @@ export default defineComponent({
         }
         let threadID = matchDefault(str, reg.regThreadTag);
         if (threadID) {
-          this.allThreadIDArray.push(threadID);
+          threadSet.add(threadID);
         }
         
-        this.allThreadIDArray = deDuplicate(this.allThreadIDArray);
-        this.allThreadIDArray = this.allThreadIDArray.sort((a, b) => a-b);
-        const args =[timestamp, level, threadID, fileName, lineNum, methodName, text];
+        const args =[timestamp, level, threadID, fileName, lineNum, methodName, mainText];
         let item = new logDataItem(i, str, ...args);
         if (item.timestamp.length < 1) {
           break;
         }
+        
         arr.push(item);
       }
+      // 排序
+      let sorted = Array.from(threadSet).sort((a:number, b: number) => a - b);
+      sorted.push('other')
+      console.log("allThreadIDArray sorted", sorted);
+      this.allThreadIDArray = sorted;
       // 初始化，线程全选
       if (this.isInit) {
-        this.selectedThreads = Array.from([...this.allThreadIDArray, 'other']);
+        this.selectedThreads = Array.from(sorted);
         this.isInit = false;
       }
-      this.timeStampArray = deDuplicate(getValFromProxy(this.timeStampArray));
+      this.timeStampArray.value = deDuplicate(getValFromProxy(this.timeStampArray));
       return arr;
     },
     generateGridData (instanceArr:logDataItem[]) {
@@ -215,7 +224,7 @@ export default defineComponent({
     },
     updateView () {
       this.timeStampArray = [];
-      this.allThreadIDArray = [];
+      this.allThreadIDArray.value = [];
       this.generateGridData(this.convertToClass(this.getLogData));
     }
   }
@@ -225,16 +234,24 @@ export default defineComponent({
 <template>
   <div class="thread-view">
     <div class="thread-view-filter__grid">
-      <div class="thread-view__tag">
-        标签：
+      <div class="thread-view__tag grid-item">
+        <p>Tags:</p>
         <div class="tag-tabs">
           <option-tab :tabKey="`fileName`" :text="`文件名`" :colorType="`warning`"></option-tab>
           <option-tab :tabKey="`methodName`" :text="`方法名`" :colorType="`success`"></option-tab>
           <option-tab :tabKey="`mainText`" :text="`正文`" :colorType="`main`"></option-tab>
         </div>
       </div>
-      <div class="show-threads">
-        <p>有效线程</p> {{allThreadIDArray}}
+      <div class="thread-alias grid-item">
+        <p>Alias:</p>
+        <el-switch
+          v-model="showAlias"
+          class="ml-2"
+          style="--el-switch-on-color: #13ce66; --el-switch-off-color: #CCCCCC"
+        />
+      </div>
+      <div class="show-threads grid-item">
+        <p>Threads:</p>
         <el-select
           @change="changeThreads"
           v-model="selectedThreads"
@@ -243,7 +260,7 @@ export default defineComponent({
           style="width: 100%"
         >
           <el-option
-            v-for="thread in [...allThreadIDArray, 'other']"
+            v-for="thread in allThreadIDArray"
             :key="thread"
             :label="thread"
             :value="thread"
@@ -254,7 +271,11 @@ export default defineComponent({
     
     <div class="thread-view__header">
       <div class="timestamp-left header-timestamp">时间戳</div>
-      <div class="header-title header-thread" v-for="(thread, t) in selectedThreads" :key="t">线程：{{thread}}</div>
+      <div class="header-title header-thread" v-for="(thread, t) in selectedThreads" :key="t">
+        线程：{{thread}}
+        <input class="header-thread-alias" v-show="showAlias" placeholder="输入别名"/>
+        <!-- <div class="alias-editable" v-show="showAlias" contenteditable="true" aria-placeholder="输入别名"></div> -->
+      </div>
     </div>
     <div class="thread-view__panel">
       <div class="row" v-for="(timestamp, i) in timeStampArray" :key="i">
@@ -274,7 +295,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 @import "src/assets/colors.scss";
-$header-height: 30px;
+$header-height: 40px;
 .I {
   background: $bg;
 }
@@ -294,16 +315,19 @@ $header-height: 30px;
   flex:1;
   .thread-view-filter__grid {
     display: grid;
-    grid-template-columns: 360px 1fr;
+    grid-template-columns: 360px 120px 1fr;
     grid-template-rows: repeat(1, 60px);
     grid-gap: 20px;
-
-    .thread-view__tag{
-      padding: 0 10px;
-      width: 370px;
+    .grid-item {
       display: flex;
       justify-content: center;
       align-items: center;
+      > p {
+        margin-right: 10px;
+      }
+    }
+    .thread-view__tag {
+      width: 370px;
       .tag-tabs {
         flex: 1;
         display: flex;
@@ -312,10 +336,7 @@ $header-height: 30px;
     }
   }
   .show-threads {
-    display: flex;
     width: 100%;
-    justify-content: center;
-    align-items: center;
     > p {
       width: 80px;
     }
@@ -334,6 +355,8 @@ $header-height: 30px;
     }
     .header-timestamp {
       border: 1px solid $line;
+      border-bottom: none;
+      border-right: none;
     }
     .header-thread {
       flex:1;
@@ -342,6 +365,31 @@ $header-height: 30px;
       border-top: 1px solid $line;
       border-right: 1px solid $line;
       color: $text-sub;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:last-child {
+        padding-right: 10px;
+      }
+      .header-thread-alias {
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid $line;
+        border-radius: 5px;
+        margin: 0 10px;
+        text-align: center;
+      }
+      .alias-editable {
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid $line;
+        border-radius: 5px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        margin: 0 10px;
+        flex: 1;
+      }
     }
   }
   .thread-view__footer {
@@ -351,7 +399,6 @@ $header-height: 30px;
   .timestamp-left {
     width: 120px;
     overflow: hidden scroll;
-    border-right: 1px;
     border-color: $line;
     display: flex;
     justify-content: center;
@@ -366,7 +413,6 @@ $header-height: 30px;
       justify-content: center;
       border: 1px solid $line;
       .timestamp-left {
-        padding-top: 10px;
       }
       .lines-right {
         width: 0;
@@ -376,7 +422,7 @@ $header-height: 30px;
       }
     }
     .column-text__line {
-      padding: 0 5px;
+      padding: 0 10px;
       margin-bottom: 1px;
       display: flex;
       flex-flow: row wrap;
