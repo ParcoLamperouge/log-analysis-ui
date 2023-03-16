@@ -240,8 +240,20 @@ export default defineComponent({
           curObj[threadID].push(ins);
         }
       })
-      this.drawData = rowMap;
-      return rowMap;
+      // 线程筛选后，如果一行数据没有任何数据，该行不展示
+      let output = {};
+      let filterTimestamp = [];
+      Object.keys(rowMap).forEach((k) => {
+        let values = Object.values(rowMap[k]).flat();
+        if (values.length > 0) {
+          output[k] = rowMap[k];
+          filterTimestamp.push(k);
+        }
+      });
+      // 保存最终输出的数据
+      this.drawData = output;
+      this.timeStampArray = filterTimestamp;
+      return output;
     },
     updateView () {
       this.timeStampArray = [];
