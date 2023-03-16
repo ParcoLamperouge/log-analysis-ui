@@ -38,6 +38,9 @@ export default defineComponent({
     const showLoading = ref(false);
     const loadingTimeout = ref(0);
 
+    // 控制table 缩放
+    const zoomSize = ref(100);
+
     const logStoreIns = logDataStore();
     const filterStoreIns = filterStore();
     
@@ -56,6 +59,7 @@ export default defineComponent({
       loading,
       showLoading,
       loadingTimeout,
+      zoomSize,
       logStoreIns,
       panelsArray,
       timeStampArray,
@@ -155,8 +159,8 @@ export default defineComponent({
         // 如果没有，则认为是非业务日志，去掉方括号的部分视为正文
         else {
           mainText = removeRecognizedTag(str).trim();
-          // let unrecognizedTags = matchDefault(str, reg.regSplitTag);
           // TODO 呈现第三方tag
+          // let unrecognizedTags = matchDefault(str, reg.regSplitTag);
           // console.log("unrecognizedTags", unrecognizedTags);
         }
         let timestamp = matchDefault(str, reg.regTimeTag);
@@ -283,6 +287,10 @@ export default defineComponent({
           style="--el-switch-on-color: #13ce66; --el-switch-off-color: #CCCCCC"
         />
       </div>
+      <div class="zoom-bar grid-item">
+        <p>Zoom:</p>
+          <el-slider v-model="zoomSize" :min="20"/>
+      </div>
       <div class="show-threads grid-item">
         <p>Threads:</p>
         <el-select
@@ -302,7 +310,7 @@ export default defineComponent({
       </div>
     </div>
     
-    <div class="thread-view__header">
+    <div class="thread-view__header"  :style="`zoom: ${zoomSize/100}`">
       <div class="timestamp-left header-timestamp">时间戳</div>
       <div class="header-title header-thread" v-for="(thread, t) in selectedThreads" :key="t">
         线程：{{thread}}
@@ -310,7 +318,7 @@ export default defineComponent({
         <!-- <div class="alias-editable" v-show="showAlias" contenteditable="true" aria-placeholder="输入别名"></div> -->
       </div>
     </div>
-    <div class="thread-view__panel" v-loading="showLoading">
+    <div class="thread-view__panel" v-loading="showLoading"  :style="`zoom: ${zoomSize/100}`">
       <div class="row" v-for="(timestamp, i) in timeStampArray" :key="i">
         <div class="timestamp-left">{{timestamp}}</div>
         <div class="lines-right column" v-for="(lines, j) in drawData[timestamp]" :key="j">
@@ -348,7 +356,7 @@ $header-height: 40px;
   flex: 1;
   .thread-view-filter__grid {
     display: grid;
-    grid-template-columns: 360px 120px 1fr;
+    grid-template-columns: 320px 80px 150px 1fr;
     grid-template-rows: repeat(1, 60px);
     grid-gap: 20px;
     .grid-item {
@@ -360,7 +368,6 @@ $header-height: 40px;
       }
     }
     .thread-view__tag {
-      width: 370px;
       .tag-tabs {
         flex: 1;
         display: flex;
