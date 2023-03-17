@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { logDataStore, filterStore, viewStore } from "../../stores/mainStore"
 import { mapState } from "pinia";
 import { ViewTypes } from "../../utils/enum"
-import DropView from "../DropView.vue"
+import DropView from "../../components/DropView.vue"
 export default {
   components: { DropView },
   setup(){
