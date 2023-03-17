@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ref, reactive, defineComponent, h } from "vue";
+import { ref, defineComponent} from "vue";
 import { ElNotification } from 'element-plus';
 import { logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
@@ -46,7 +46,7 @@ export default defineComponent({
     // 控制table 缩放
     const zoomSize = ref(100);
 
-    const logStoreIns = logDataStore();
+    const insLogStore = logDataStore();
     const filterStoreIns = filterStore();
     
     // 重置筛选项
@@ -65,7 +65,7 @@ export default defineComponent({
       showLoading,
       loadingTimeout,
       zoomSize,
-      logStoreIns,
+      insLogStore,
       panelsArray,
       timeStampArray,
       allThreadIDArray,
@@ -87,22 +87,19 @@ export default defineComponent({
     ...mapState(logDataStore, {
       dropCount: "dropCount",
     }),
-    ...mapState(logDataStore, {
-      getLogData: "getLogData"
-    }),
     threadList () {
-      if (!this.getLogData) {
+      if (!this.insLogStore.getLogData) {
         return [];
       }
-      return this.getLogData.filter((log:string) => {
+      return this.insLogStore.getLogData.filter((log:string) => {
         return log.indexOf(THREAD_ID_KEY) > -1
       })
     },
     noThreadList() {
-      if (!this.getLogData) {
+      if (!this.insLogStore.getLogData) {
         return [];
       }
-      return this.getLogData.filter((log:string) => {
+      return this.insLogStore.getLogData.filter((log:string) => {
         return log.indexOf(THREAD_ID_KEY) < 0
       })
     },
@@ -132,7 +129,7 @@ export default defineComponent({
   methods: {
     changeThreads () {
       this.loading = true;
-      this.generateGridData(this.convertToClass(this.getLogData));
+      this.generateGridData(this.convertToClass(this.insLogStore.getLogData));
       this.loading = false;
     },
     // 转换为实体类
@@ -265,7 +262,7 @@ export default defineComponent({
     updateView () {
       this.timeStampArray = [];
       this.allThreadIDArray = [];
-      this.generateGridData(this.convertToClass(this.getLogData));
+      this.generateGridData(this.convertToClass(this.insLogStore.getLogData));
     }
   }
 })

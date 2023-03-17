@@ -1,21 +1,21 @@
 <script lang="ts">
 import { ref } from "vue";
 import { logDataStore, viewStore }from "../../stores/mainStore";
-import LogHeader from './Header.vue';
+import LogHeader from './ViewHeader.vue';
 import TextView from './TextView.vue';
 import ThreadView from './ThreadView.vue';
 import { mapState } from 'pinia';
 export default {
   components: {LogHeader, TextView, ThreadView},
   setup() {
-    const logStoreIns = logDataStore();
+    const insLogStore = logDataStore();
     let dataArray = ref<string[]>([]);
     return {
-      dataArray, logStoreIns, 
+      dataArray, insLogStore, 
     }
   },
   mounted () {
-    this.dataArray = this.logStoreIns.logFile.data;
+    this.dataArray = this.insLogStore.logFile.data;
   },
   watch: {
     // TODO 文件更新没做好

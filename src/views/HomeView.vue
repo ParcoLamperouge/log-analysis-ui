@@ -1,7 +1,7 @@
 <script lang="ts">
 import { ref, nextTick} from "vue";
 import { logDataStore } from "../stores/mainStore";
-import AnalyzePage from './analyzePage/Analyze.vue';
+import AnalyzePage from './analyzePage/AnalysisView.vue';
 export default {
   components: { AnalyzePage },
   setup() {

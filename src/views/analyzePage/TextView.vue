@@ -4,7 +4,7 @@ import { viewStore, logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
 export default {
   setup() {
-    const logStoreIns = logDataStore();
+    const insLogStore = logDataStore();
     const insFilterStore = filterStore();
     let input = ref('');
     const inputFilter = (keyword:string) => {
@@ -15,7 +15,9 @@ export default {
     insFilterStore.$reset();
     let dataArray = ref<string[]>([]);
     return {
-      input, dataArray, logStoreIns,
+      input, dataArray, 
+      insLogStore,
+      insFilterStore,
       inputFilter
     }
   },
@@ -34,7 +36,7 @@ export default {
     }),
     showList () {
       return this.dataArray.filter((log:string) => {
-        return log.indexOf(this.filterKeyWord) > -1
+        return log.indexOf(this.insFilterStore.customKeyword) > -1
       })
     }
   },
@@ -45,7 +47,7 @@ export default {
   },
   methods: {
     updateView () {
-      this.dataArray = this.logStoreIns.logFile.data;
+      this.dataArray = this.insLogStore.logFile.data;
     }
   }
 }
