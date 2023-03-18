@@ -42,6 +42,22 @@ export default {
   color: $bg;
   text-align: center;
   cursor: pointer;
+  &.default {
+    color: $text-desc;
+    border: 1px solid $text-desc;
+    &:hover {
+      color: $bg;
+      background: $text-desc;
+    }
+    &.active {
+      color: $text;
+      border: 1px solid $text;
+      &:hover {
+        color: $bg;
+        background: $text-desc;
+      }
+    }
+  }
   &.main {
     background: $main-disabled;
     &.active {
@@ -50,20 +66,40 @@ export default {
   }
   &.warning {
     background: $warning-disabled;
+    &:hover {
+      background: $warning-hover;
+    }
     &.active {
       background: $warning;
+      
+      &:hover {
+        background: $warning-hover;
+      }
     }
   }
   &.success {
     background: $success-disabled;
+    
+    &:hover {
+      background: $success-hover;
+    }
     &.active {
       background: $success;
+      &:hover {
+        background: $success-hover;
+      }
     }
   }
   &.error {
     background: $error-disabled;
+    &:hover {
+      background: $error-hover;
+    }
     &.active {
       background: $error;
+      &:hover {
+        background: $error-hover;
+      }
     }
   }
 }

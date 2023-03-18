@@ -135,7 +135,7 @@ export default defineComponent({
         <div class="tag-tabs">
           <option-tab :tabKey="`fileName`" :text="`文件名`" :colorType="`warning`"></option-tab>
           <option-tab :tabKey="`methodName`" :text="`方法名`" :colorType="`success`"></option-tab>
-          <option-tab :tabKey="`mainText`" :text="`正文`" :colorType="`main`"></option-tab>
+          <option-tab :tabKey="`mainText`" :text="`正文`" :colorType="`default`"></option-tab>
         </div>
       </div>
       <div class="thread-alias grid-item">
@@ -340,8 +340,8 @@ $header-height: 40px;
           color: $bg;
         }
         &.main-text {
-          background-color: $main;
-          color: $bg;
+          background-color: $bg;
+          // color: $bg;
         }
 
       }
