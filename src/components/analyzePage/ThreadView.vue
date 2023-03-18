@@ -3,36 +3,10 @@ import { ref, defineComponent} from "vue";
 import { ElNotification } from 'element-plus';
 import { logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
-import reg from './regExp';
-import { logDataItem } from '../../class/logFile';
-import { getValFromProxy, deepClone } from "../../utils/tools"
+import { generateGridData, extractData } from './stringHandle';
+import { getValFromProxy } from "../../utils/tools"
 import OptionTab from '../../components/OptionTab.vue'
-const THREAD_ID_KEY = 'tid:';
-const MAIN_TEXT_SPLIT_KEY = '--->';
 
-function matchDefault(str:string, reg:RegExp, defaultVal:any = "") {
-  const matchResult:any = str.match(reg);
-  if (!matchResult || matchResult.length <= 0) {
-    return defaultVal;
-  } else {
-    return matchResult[0];
-  }
-}
-// 将已经识别的tag从字符串中移除
-function removeRecognizedTag (str:string) {
-  let newStr = str;
-  const removeArr = [
-    matchDefault(str, reg.regTimeWithSquareBrackets), 
-    matchDefault(str, reg.regLevelWithSquareBrackets), 
-    matchDefault(str, reg.regFileWithSquareBracket), 
-    matchDefault(str, reg.regThreadWithSquareBracket), 
-    matchDefault(str, reg.regMethodWithSquareBracket)
-  ];
-  removeArr.forEach(square => {
-    newStr = newStr.replace(square, '');
-  }) 
-  return newStr;
-}
 export default defineComponent({
   components: {OptionTab},
   setup() {
@@ -47,10 +21,10 @@ export default defineComponent({
     const zoomSize = ref(100);
 
     const insLogStore = logDataStore();
-    const filterStoreIns = filterStore();
+    const insFilterStore = filterStore();
     
     // 重置筛选项
-    filterStoreIns.$reset();
+    insFilterStore.$reset();
     const selectedThreads = ref<any[]>([]);
     
     let panelsArray = ref<any>([]);
@@ -86,23 +60,7 @@ export default defineComponent({
     }),
     ...mapState(logDataStore, {
       dropCount: "dropCount",
-    }),
-    threadList () {
-      if (!this.insLogStore.getLogData) {
-        return [];
-      }
-      return this.insLogStore.getLogData.filter((log:string) => {
-        return log.indexOf(THREAD_ID_KEY) > -1
-      })
-    },
-    noThreadList() {
-      if (!this.insLogStore.getLogData) {
-        return [];
-      }
-      return this.insLogStore.getLogData.filter((log:string) => {
-        return log.indexOf(THREAD_ID_KEY) < 0
-      })
-    },
+    })
   },
   watch: {
     dropCount () {
@@ -129,7 +87,15 @@ export default defineComponent({
   methods: {
     changeThreads () {
       this.loading = true;
-      this.generateGridData(this.convertToClass(this.insLogStore.getLogData));
+      let {
+        output, timeStampArray
+      } = generateGridData(
+        this.convertToClass(this.insLogStore.getLogData),
+        this.timeStampArray, 
+        this.selectedThreads
+      );
+      this.drawData = output;
+      this.timeStampArray = timeStampArray;
       this.loading = false;
     },
     // 转换为实体类
@@ -138,62 +104,8 @@ export default defineComponent({
         throw new Error("convertToClass input invalid");
       }
       // list 提取 时间戳 去重
-      let arr = [];
       let dataArr = getValFromProxy(rawArr);
-
-      console.log("convertToClass", dataArr.length)
-
-      // 初始化线程名集合
-      let threadSet = new Set();
-      let timestampSet = new Set();
-      for (let i = 0; i < dataArr.length; i++) {
-        let str = dataArr[i];
-        // 初始化正文
-        let mainText = '';
-        // 按分割符，切分tag区域和正文区域, 
-        if (str.indexOf(MAIN_TEXT_SPLIT_KEY) > -1) {
-          let strSplitArr = str.split(MAIN_TEXT_SPLIT_KEY);
-          str = strSplitArr[0];
-          mainText = strSplitArr[1].trim();
-        } 
-        // 如果没有，则认为是非业务日志，去掉方括号的部分视为正文
-        else {
-          mainText = removeRecognizedTag(str).trim();
-          // TODO 呈现第三方tag
-          // let unrecognizedTags = matchDefault(str, reg.regSplitTag);
-          // console.log("unrecognizedTags", unrecognizedTags);
-        }
-        let timestamp = matchDefault(str, reg.regTimeTag);
-        let level = matchDefault(str, reg.regLevelTag);
-        let methodName = matchDefault(str, reg.regMethodTag);
-        let fileTag = str.match(reg.regFileTag) ? str.match(reg.regFileTag) : "";
-        let fileName = "";
-        let lineNum = 0;
-        if (timestamp) {
-          timestampSet.add(timestamp);
-        }
-        if (fileTag.length >= 4) {
-          // 有效的文件：行号tag
-          fileName = fileTag[2];
-          lineNum = fileTag[3];
-        }
-        let threadID = matchDefault(str, reg.regThreadTag);
-        if (threadID) {
-          threadSet.add(threadID);
-        }
-        
-        const args =[timestamp, level, threadID, fileName, lineNum, methodName, mainText];
-        let item = new logDataItem(i, str, ...args);
-        if (item.timestamp.length < 1) {
-          break;
-        }
-        arr.push(item);
-      }
-      // 排序
-      let sortFn:any = (a:number, b: number) => a - b;
-      let sorted:any[] = Array.from(threadSet).sort(sortFn);
-      sorted.push('other')
-      console.log("allThreadIDArray sorted", sorted);
+      let { arr, sorted, timestampSet } = extractData(dataArr);
       this.allThreadIDArray = sorted;
       // 初始化，线程全选
       if (this.isInit) {
@@ -203,66 +115,13 @@ export default defineComponent({
       this.timeStampArray = Array.from(timestampSet);
       return arr;
     },
-    generateGridData (instanceArr:logDataItem[]) {
-      // 时间轴（纵轴）
-      if (this.timeStampArray.length < 0 ) {
-        return;
-      }
-      // 预先生成好容器
-      let rowTemplate:any = {}
-      // 根据有效线程数 (横轴)，动态分配
-      this.selectedThreads.forEach((e) => {
-        rowTemplate[e] = [];
-      });
-      console.log("allThreadIDArray", this.allThreadIDArray)
-      // 最终数据输出容器
-      let rowMap:any = {};
-
-      // 数据分发 - 生成时间轴
-      let timestampArr = getValFromProxy(this.timeStampArray);
-      timestampArr.forEach((t:string) => {
-        let dataObj = deepClone(rowTemplate);
-        rowMap[t] = dataObj;
-      });
-      /*
-      rowMap format = {
-        '12:00:00.000': {
-          thread1: [],
-          thread2: [],
-          thread3: []
-        }
-      }
-      */
-      instanceArr.forEach((ins:logDataItem) => {
-        let timestamp = ins.timestamp;
-        let threadID = ins.threadID;
-        let curObj = rowMap[timestamp];
-        if (!threadID) {
-          threadID = 'other';
-        }
-        if (curObj[threadID]) {
-          curObj[threadID].push(ins);
-        }
-      })
-      // 线程筛选后，如果一行数据没有任何数据，该行不展示
-      let output:any = {};
-      let filterTimestamp:string[] = [];
-      Object.keys(rowMap).forEach((k) => {
-        let values = Object.values(rowMap[k]).flat();
-        if (values.length > 0) {
-          output[k] = rowMap[k];
-          filterTimestamp.push(k);
-        }
-      });
-      // 保存最终输出的数据
-      this.drawData = output;
-      this.timeStampArray = filterTimestamp;
-      return output;
-    },
-    updateView () {
+    emptyCurrent() {
       this.timeStampArray = [];
       this.allThreadIDArray = [];
-      this.generateGridData(this.convertToClass(this.insLogStore.getLogData));
+    },
+    updateView () {
+      this.emptyCurrent();
+      this.changeThreads();
     }
   }
 })
@@ -315,7 +174,6 @@ export default defineComponent({
       <div class="header-title header-thread" v-for="(thread, t) in selectedThreads" :key="t">
         线程：{{thread}}
         <input class="header-thread-alias" v-show="showAlias" placeholder="输入别名"/>
-        <!-- <div class="alias-editable" v-show="showAlias" contenteditable="true" aria-placeholder="输入别名"></div> -->
       </div>
     </div>
     <div class="thread-view__panel" v-loading="showLoading"  :style="`zoom: ${zoomSize/100}`">

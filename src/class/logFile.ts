@@ -41,5 +41,4 @@ export class logDataItem {
         this.methodName = methodName;
         this.text = text;
     }
-    
 }

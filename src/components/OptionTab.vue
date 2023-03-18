@@ -9,19 +9,19 @@ export default {
     colorType: String
   },
   setup() {
-    const filterStoreIns:any =  filterStore();
+    const insFilterStore:any =  filterStore();
     let active = ref(true);
     return {
-      active,filterStoreIns
+      active,insFilterStore
     }
   },
   mounted () {
-    this.active = this.filterStoreIns[this.tabKey + 'Switch'];
+    this.active = this.insFilterStore[this.tabKey + 'Switch'];
   },
   methods: {
     switchTab () {
       this.active = !this.active;
-      this.filterStoreIns[this.tabKey + 'Switch'] = this.active;
+      this.insFilterStore[this.tabKey + 'Switch'] = this.active;
     }
   }
 }
