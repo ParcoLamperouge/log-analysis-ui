@@ -340,7 +340,7 @@ $header-height: 40px;
           color: $bg;
         }
         &.main-text {
-          background-color: $bg;
+          // background-color: $bg;
           // color: $bg;
         }
 

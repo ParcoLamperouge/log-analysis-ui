@@ -62,7 +62,7 @@ export const extractData:any = (dataArr:any[]) => {
     if (fileTag.length >= 4) {
       // 有效的文件：行号tag
       fileName = fileTag[2];
-      lineNum = fileTag[3];
+      lineNum = fileTag[4];
     }
     const threadID = matchRegExp(str, reg.regThreadTag);
     if (threadID) {
@@ -72,7 +72,7 @@ export const extractData:any = (dataArr:any[]) => {
     const args =[timestamp, level, threadID, fileName, lineNum, methodName, mainText];
     const item = new logDataItem(i, str, ...args);
     if (item.timestamp.length < 1) {
-      break;
+      continue;
     }
     arr.push(item);
   }

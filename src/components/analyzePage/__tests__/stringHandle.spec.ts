@@ -12,7 +12,7 @@ const log2 = [
   '[20:53:29.168][I][XEApp.cpp:519]: [XEApp::InitFont][tid:39995] ---> <<< [全局] 初始化字体库结束\r', 
   '[20:53:29.173][I][XEApp.cpp:328]: [XEApp::InitQss][tid:39996] ---> <<< [全局] 初始化QSS样式表开始\r', 
   '[20:53:29.181][I][XEApp.cpp:384]: [XEApp::InitQss][tid:39997] ---> <<< [全局] 初始化QSS样式表结束\r', 
-  '[20:53:29.181][I][XEApp.cpp:602]: [XEApp::InitLoca…esource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置开始\r', '[20:53:29.181][I][XEApp.cpp:611]: [XEApp::InitLoca…esource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置结束\r', '[20:53:29.182][I][XEApp.cpp:217]: [XEApp::InitContext][tid:39996] ---> <<< [全局] 初始化运行环境结束\r', 
+  '[20:53:29.181][I][XEApp.cpp:602]: [XEApp::InitLocalSource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置开始\r', '[20:53:29.181][I][XEApp.cpp:611]: [XEApp::InitLoca…esource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置结束\r', '[20:53:29.182][I][XEApp.cpp:217]: [XEApp::InitContext][tid:39996] ---> <<< [全局] 初始化运行环境结束\r', 
   '[20:53:29.183][I][XEApp.cpp:228]: [XEApp::RunApp][tid:39996] ---> <<< [全局] RunApp开始\r', 
   '[20:53:29.183][I][XEBackend.cpp:68]: [XEBackend::Init][tid:39996] ---> 初始化后端服务完成.\r', 
   '[20:53:29.186][I][XEBackend.cpp:743]: [XEBackend::TrainingLogin][tid:39996] ---> >>> 轮询登录态启动：\r'
@@ -69,7 +69,7 @@ describe('generateGridData', () => {
     expect(Object.keys(output)[0]).toBe('20:53:29.134');
     expect(Object.keys(output)[7]).toBe('20:53:29.186');
     
-    const testObj = output['20:53:29.134']['39996'][0];
+    const testObj = output['20:53:29.134']['39996'][0];console.log(testObj)
     expect(testObj.fileName).toBe('XEApplication.cpp');
     expect(testObj.level).toBe('I');
     expect(testObj.lineNumber).toBe('72');
