@@ -141,6 +141,8 @@ export default defineComponent({
       setTimeout(this.clearTimerInterval, SCROLL_TIME)
       // this.dataGrid.scrollTop = this.dataGrid.scrollHeight;
     },
+    scrollTopFn () {},
+    scrollBottomFn () {},
     changeThreads () {
       this.loading = true;
       let {
