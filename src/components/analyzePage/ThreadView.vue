@@ -15,7 +15,7 @@ const SCROLL_GAP = 10;
 export default defineComponent({
   components: {OptionTab},
   setup() {
-    const dataGrid = ref(null);
+    const dataGrid = ref<any>(null);
     const isInit = ref(true);
     const showAlias = ref(false);
 
@@ -37,7 +37,7 @@ export default defineComponent({
     let timeStampArray = ref<any[]>([]);
     let allThreadIDArray = ref<string[]>([]);
     let drawData = ref<any>({});
-    let scrollInterval = ref(null);
+    let scrollInterval = ref<any>(null);
     return {
       isInit,
       showAlias,
