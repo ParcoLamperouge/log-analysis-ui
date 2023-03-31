@@ -1,9 +1,10 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import HomeView from '../components/HomeView.vue';
 import AnalysisView from '../components/analyzePage/AnalysisView.vue'
-
+const hash = createWebHashHistory()
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  // history: createWebHistory(import.meta.env.BASE_URL),
+  history: hash,
   routes: [
     {
       path: '/',

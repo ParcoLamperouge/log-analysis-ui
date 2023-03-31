@@ -8,7 +8,7 @@ import pkg from './package.json'
 export default defineConfig({
   plugins: [vue(), vueJsx()],
   // base: `/${pkg.name}/`,
-  base: './${pkg.name}/',
+  base: './',
   server: {
     host: "0.0.0.0"
   },
