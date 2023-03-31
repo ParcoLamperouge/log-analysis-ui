@@ -4,7 +4,7 @@ import { ElNotification } from 'element-plus';
 import { logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
 import { generateGridData, extractData } from './stringHandle';
-import { getValFromProxy } from "../../utils/tools"
+import { getValFromProxy, _throttle } from "../../utils/tools"
 import OptionTab from '../../components/OptionTab.vue'
 import {
   ArrowUp,
@@ -38,6 +38,7 @@ export default defineComponent({
     let allThreadIDArray = ref<string[]>([]);
     let drawData = ref<any>({});
     let scrollInterval = ref<any>(null);
+    
     return {
       isInit,
       showAlias,
@@ -59,6 +60,8 @@ export default defineComponent({
   },
   mounted () {
     this.updateView();
+    this.scrollTopFn = _throttle(this.scrollTop, 1000, false);
+    this.scrollBottomFn = _throttle(this.scrollBottom, 1000, false);
   },
   computed: {
     ...mapState(filterStore, {
@@ -105,7 +108,9 @@ export default defineComponent({
       this.clearTimerInterval();
       let current = this.dataGrid.scrollTop;
       const velocity = Math.ceil(current / SCROLL_TIME) * SCROLL_GAP;
+      const that = this;
       this.scrollInterval = setInterval(() => {
+        console.log("top", that.dataGrid.scrollTop)
         if (this.dataGrid.scrollTop <= 0) {
           this.clearTimerInterval();
           return;
@@ -125,6 +130,7 @@ export default defineComponent({
       const velocity = Math.ceil((target - current) / SCROLL_TIME) * SCROLL_GAP;
       const that = this;
       this.scrollInterval = setInterval(() => {
+        console.log("bottom", that.dataGrid.scrollTop, target)
         if (that.dataGrid.scrollTop >= target) {
           that.clearTimerInterval()
           return;
@@ -240,8 +246,8 @@ export default defineComponent({
     </div>
     <div class="thread-view__footer"></div>
     <div class="scroll-btn">
-      <el-button type="primary" @click="scrollTop" circle :icon="ArrowUp" size="large"></el-button>
-      <el-button type="primary" @click="scrollBottom" circle :icon="ArrowDown" size="large"></el-button>
+      <el-button type="primary" @click="scrollTopFn" circle :icon="ArrowUp" size="large"></el-button>
+      <el-button type="primary" @click="scrollBottomFn" circle :icon="ArrowDown" size="large"></el-button>
     </div>
   </div>
 </template>
