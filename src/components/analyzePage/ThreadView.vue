@@ -96,6 +96,9 @@ export default defineComponent({
   },
   methods: {
     scrollTop() {
+      if (!this.dataGrid) {
+        return;
+      }
       this.scrollInterval && clearInterval(this.scrollInterval);
       let current = this.dataGrid.scrollTop;
       const velocity = Math.ceil(current / SCROLL_TIME) * SCROLL_GAP;
@@ -110,6 +113,9 @@ export default defineComponent({
       // this.dataGrid.scrollTop = 0;
     },
     scrollBottom() {
+      if (!this.dataGrid) {
+        return;
+      }
       this.scrollInterval && clearInterval(this.scrollInterval);
       let current = this.dataGrid.scrollTop;
       const target = this.dataGrid.scrollHeight;
