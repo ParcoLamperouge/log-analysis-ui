@@ -6,10 +6,16 @@ import { mapState } from 'pinia';
 import { generateGridData, extractData } from './stringHandle';
 import { getValFromProxy } from "../../utils/tools"
 import OptionTab from '../../components/OptionTab.vue'
-
+import {
+  ArrowUp,
+  ArrowDown,
+} from '@element-plus/icons-vue'
+const SCROLL_TIME = 200;
+const SCROLL_GAP = 10;
 export default defineComponent({
   components: {OptionTab},
   setup() {
+    const dataGrid = ref(null);
     const isInit = ref(true);
     const showAlias = ref(false);
 
@@ -31,7 +37,7 @@ export default defineComponent({
     let timeStampArray = ref<any[]>([]);
     let allThreadIDArray = ref<string[]>([]);
     let drawData = ref<any>({});
-
+    let scrollInterval = ref(null);
     return {
       isInit,
       showAlias,
@@ -44,7 +50,11 @@ export default defineComponent({
       timeStampArray,
       allThreadIDArray,
       drawData,
-      selectedThreads
+      selectedThreads,
+      dataGrid,
+      scrollInterval,
+      ArrowUp,
+      ArrowDown
     }
   },
   mounted () {
@@ -85,6 +95,35 @@ export default defineComponent({
     // }
   },
   methods: {
+    scrollTop() {
+      clearInterval(this.scrollInterval);
+      let current = this.dataGrid.scrollTop;
+      const velocity = Math.ceil(current / SCROLL_TIME) * SCROLL_GAP;
+      this.scrollInterval = setInterval(() => {
+        if (this.dataGrid.scrollTop <= 0) {
+          clearInterval(this.scrollInterval);
+          return;
+        }
+        this.dataGrid.scrollTop = current - velocity;
+        current = this.dataGrid.scrollTop;
+      }, SCROLL_GAP);
+      // this.dataGrid.scrollTop = 0;
+    },
+    scrollBottom() {
+      clearInterval(this.scrollInterval);
+      let current = this.dataGrid.scrollTop;
+      const target = this.dataGrid.scrollHeight;
+      const velocity = Math.ceil((target - current) / SCROLL_TIME) * SCROLL_GAP;
+      this.scrollInterval = setInterval(() => {
+        if (this.dataGrid.scrollTop >= target) {
+          clearInterval(this.scrollInterval);
+          return;
+        }
+        this.dataGrid.scrollTop = current + velocity;
+        current = this.dataGrid.scrollTop;
+      }, SCROLL_GAP);
+      // this.dataGrid.scrollTop = this.dataGrid.scrollHeight;
+    },
     changeThreads () {
       this.loading = true;
       let {
@@ -176,7 +215,7 @@ export default defineComponent({
         <input class="header-thread-alias" v-show="showAlias" placeholder="输入别名"/>
       </div>
     </div>
-    <div class="thread-view__panel" v-loading="showLoading"  :style="`zoom: ${zoomSize/100}`">
+    <div class="thread-view__panel" v-loading="showLoading"  :style="`zoom: ${zoomSize/100}`" ref="dataGrid">
       <div class="row" v-for="(timestamp, i) in timeStampArray" :key="i">
         <div class="timestamp-left">{{timestamp}}</div>
         <div class="lines-right column" v-for="(lines, j) in drawData[timestamp]" :key="j">
@@ -189,6 +228,10 @@ export default defineComponent({
       </div>
     </div>
     <div class="thread-view__footer"></div>
+    <div class="scroll-btn">
+      <el-button type="primary" @click="scrollTop" circle :icon="ArrowUp" size="large"></el-button>
+      <el-button type="primary" @click="scrollBottom" circle :icon="ArrowDown" size="large"></el-button>
+    </div>
   </div>
 </template>
 
@@ -212,6 +255,17 @@ $header-height: 40px;
   display: flex;
   flex-direction: column;
   flex: 1;
+  position: relative;
+  .scroll-btn {
+    position:absolute;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    button {
+      margin: 3px;
+    }
+  }
   .thread-view-filter__grid {
     display: grid;
     grid-template-columns: 320px 80px 150px 1fr;
