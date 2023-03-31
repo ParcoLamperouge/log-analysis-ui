@@ -95,16 +95,19 @@ export default defineComponent({
     // }
   },
   methods: {
+    clearTimerInterval (){
+      this.scrollInterval && (this.scrollInterval = clearInterval(this.scrollInterval));
+    },
     scrollTop() {
       if (!this.dataGrid) {
         return;
       }
-      this.scrollInterval && clearInterval(this.scrollInterval);
+      this.clearTimerInterval();
       let current = this.dataGrid.scrollTop;
       const velocity = Math.ceil(current / SCROLL_TIME) * SCROLL_GAP;
       this.scrollInterval = setInterval(() => {
         if (this.dataGrid.scrollTop <= 0) {
-          clearInterval(this.scrollInterval);
+          this.clearTimerInterval();
           return;
         }
         this.dataGrid.scrollTop = current - velocity;
@@ -116,18 +119,20 @@ export default defineComponent({
       if (!this.dataGrid) {
         return;
       }
-      this.scrollInterval && clearInterval(this.scrollInterval);
+      
       let current = this.dataGrid.scrollTop;
       const target = this.dataGrid.scrollHeight;
       const velocity = Math.ceil((target - current) / SCROLL_TIME) * SCROLL_GAP;
+      const that = this;
       this.scrollInterval = setInterval(() => {
-        if (this.dataGrid.scrollTop >= target) {
-          clearInterval(this.scrollInterval);
+        if (that.dataGrid.scrollTop >= target) {
+          that.clearTimerInterval()
           return;
         }
         this.dataGrid.scrollTop = current + velocity;
         current = this.dataGrid.scrollTop;
       }, SCROLL_GAP);
+      setTimeout(this.clearTimerInterval, SCROLL_TIME)
       // this.dataGrid.scrollTop = this.dataGrid.scrollHeight;
     },
     changeThreads () {
