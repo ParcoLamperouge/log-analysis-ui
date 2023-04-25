@@ -34,6 +34,13 @@ const log2 = [
   '[20:53:29.183][I][XEBackend.cpp:68]: [XEBackend::Init][tid:39996] ---> 初始化后端服务完成.\r', 
   '[20:53:29.186][I][XEBackend.cpp:743]: [XEBackend::TrainingLogin][tid:39996] ---> >>> 轮询登录态启动：\r'
   ];
+
+const log3 = [
+  '[15:37:52.474][I][tid:0x10a5a2600][XEApp.cpp:456][InitLocalResource] ---> <<< [全局] 初始化Web本地资源配置开始',
+  '[15:37:52.474][I][tid:0x10a5a2600][XEApp.cpp:465][InitLocalResource] ---> <<< [全局] 初始化Web本地资源配置结束',
+  '[15:37:52.531][I][tid:0x7000102a3000]Loading up OpenGL on adapter ATI Technologies Inc. AMD Radeon Pro 5300 OpenGL Engine',
+  '[15:37:52.531][I][tid:0x7000102a3000]OpenGL loaded successfully, version 4.1 ATI-4.7.101, shading language 4.10'
+]
 const result1 = {
   sorted: '["39996","other"]',
   timeStampArray: ["20:53:29.134","20:53:29.165","20:53:29.168","20:53:29.173","20:53:29.181","20:53:29.182","20:53:29.183","20:53:29.186"],
@@ -74,6 +81,13 @@ describe('extractData', () => {
     expect(arr.length).toBe(14);
     expect(JSON.stringify(sorted)).toBe(result2.sorted);
     expect(JSON.stringify(Array.from(timestampSet))).toBe(JSON.stringify(result2.timeStampArray))
+  })
+  it('log3', () => {
+    const {
+      arr
+    } = extractData(log3);
+    expect(arr[0].threadID).toBe('0x10a5a2600');
+    expect(arr[2].threadID).toBe('0x7000102a3000');
   })
 });
 describe('generateGridData', () => {
