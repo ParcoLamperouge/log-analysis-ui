@@ -11,20 +11,20 @@ export default defineComponent({
   props: {
     element: {
       default: () => {
-        return null;
+        return window;
       }
     }
   },
   methods: {
     scrollTopFn () {
-      const target = this.element || window;
+      const target = this.element;
       target.scrollTo({
         top: 0,
         behavior: "smooth"
       });
     },
     scrollBottomFn () {
-      const target = this.element || window;
+      const target = this.element;
       let body = this.element || document.querySelector('body');
       target.scrollTo({
         top: body.scrollHeight,
