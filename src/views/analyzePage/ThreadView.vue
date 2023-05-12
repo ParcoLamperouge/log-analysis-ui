@@ -4,9 +4,12 @@ import { ElNotification } from 'element-plus';
 import { logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
 import { generateGridData, extractData } from './stringHandle';
-import { getValFromProxy } from "../../utils/tools"
-import OptionTab from '../../components/OptionTab.vue'
-
+import { getValFromProxy, _throttle} from "../../utils/tools"
+import OptionTab from '../../views/OptionTab.vue'
+import {
+  ArrowUp,
+  ArrowDown,
+} from '@element-plus/icons-vue'
 const SCROLL_TIME = 200;
 const SCROLL_GAP = 10;
 export default defineComponent({
@@ -51,10 +54,15 @@ export default defineComponent({
       selectedThreads,
       dataGrid,
       scrollInterval,
+      ArrowUp,
+      ArrowDown
     }
   },
   mounted () {
     this.updateView();
+    // bind arrow buttons
+    this.scrollTopFn = _throttle(this.scrollTop, 1000, false);
+    this.scrollBottomFn = _throttle(this.scrollBottom, 1000, false);
   },
   computed: {
     ...mapState(filterStore, {
