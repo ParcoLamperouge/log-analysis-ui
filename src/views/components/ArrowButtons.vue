@@ -18,7 +18,10 @@ export default defineComponent({
   },
   methods: {
     scrollTopFn () {
-      let target = this.element.scrollTo ? this.element : window;
+      let target = this.element || window;
+      if (!target || !target.scrollTo) {
+        return;
+      }
       target.scrollTo({
         top: 0,
         behavior: "smooth"
@@ -27,6 +30,9 @@ export default defineComponent({
     scrollBottomFn () {
       let target = this.element.scrollTo ? this.element : window;
       let body = this.element.scrollHeight ? this.element : document.querySelector('body');
+      if (!target || !body) {
+        return;
+      }
       target.scrollTo({
         top: body.scrollHeight,
         behavior: "smooth"
