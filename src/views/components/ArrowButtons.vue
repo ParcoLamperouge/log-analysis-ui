@@ -1,32 +1,38 @@
 <script lang="ts">
+import { ref, defineComponent } from 'vue';
 import { ArrowUp, ArrowDown } from '@element-plus/icons-vue';
-import { defineComponent } from 'vue';
+
 export default defineComponent({
   setup() {
+    const target = ref<any>(window);
     return {
       ArrowUp,
-      ArrowDown
+      ArrowDown,
+      target
     }
   },
   props: {
     element: {
       default: () => {
-        return window;
+        return null;
       }
+    }
+  },
+  mounted() {
+    if (this.element) {
+      this.target = this.element;
     }
   },
   methods: {
     scrollTopFn () {
-      const target = this.element;
-      target.scrollTo({
+      this.target.scrollTo({
         top: 0,
         behavior: "smooth"
       });
     },
     scrollBottomFn () {
-      const target = this.element;
       let body = this.element || document.querySelector('body');
-      target.scrollTo({
+      this.target.scrollTo({
         top: body.scrollHeight,
         behavior: "smooth"
       });
