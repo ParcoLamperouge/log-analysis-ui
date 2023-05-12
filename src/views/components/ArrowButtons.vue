@@ -17,14 +17,16 @@ export default defineComponent({
   },
   methods: {
     scrollTopFn () {
-      window.scrollTo({
+      const target = this.element || window;
+      target.scrollTo({
         top: 0,
         behavior: "smooth"
       });
     },
     scrollBottomFn () {
+      const target = this.element || window;
       let body = this.element || document.querySelector('body');
-      window.scrollTo({
+      target.scrollTo({
         top: body.scrollHeight,
         behavior: "smooth"
       });

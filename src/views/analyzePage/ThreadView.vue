@@ -4,16 +4,15 @@ import { ElNotification } from 'element-plus';
 import { logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
 import { generateGridData, extractData } from './stringHandle';
-import { getValFromProxy, _throttle} from "../../utils/tools"
+import { getValFromProxy } from "../../utils/tools"
 import OptionTab from '../../views/OptionTab.vue'
+import ArrowButtons from '../../views/components/ArrowButtons.vue';
 import {
   ArrowUp,
   ArrowDown,
 } from '@element-plus/icons-vue'
-const SCROLL_TIME = 200;
-const SCROLL_GAP = 10;
 export default defineComponent({
-  components: { OptionTab },
+  components: { OptionTab, ArrowButtons },
   setup() {
     const dataGrid = ref<any>(null);
     const isInit = ref(true);
@@ -37,7 +36,6 @@ export default defineComponent({
     let timeStampArray = ref<any[]>([]);
     let allThreadIDArray = ref<string[]>([]);
     let drawData = ref<any>({});
-    let scrollInterval = ref<any>(null);
     
     return {
       isInit,
@@ -53,16 +51,12 @@ export default defineComponent({
       drawData,
       selectedThreads,
       dataGrid,
-      scrollInterval,
       ArrowUp,
       ArrowDown
     }
   },
   mounted () {
     this.updateView();
-    // bind arrow buttons
-    this.scrollTopFn = _throttle(this.scrollTop, 1000, false);
-    this.scrollBottomFn = _throttle(this.scrollBottom, 1000, false);
   },
   computed: {
     ...mapState(filterStore, {
@@ -99,51 +93,6 @@ export default defineComponent({
     // }
   },
   methods: {
-    clearTimerInterval (){
-      this.scrollInterval && (this.scrollInterval = clearInterval(this.scrollInterval));
-    },
-    scrollTop() {
-      if (!this.dataGrid) {
-        return;
-      }
-      this.clearTimerInterval();
-      let current = this.dataGrid.scrollTop;
-      const velocity = Math.ceil(current / SCROLL_TIME) * SCROLL_GAP;
-      const that = this;
-      this.scrollInterval = setInterval(() => {
-        console.log("top", that.dataGrid.scrollTop)
-        if (this.dataGrid.scrollTop <= 0) {
-          this.clearTimerInterval();
-          return;
-        }
-        this.dataGrid.scrollTop = current - velocity;
-        current = this.dataGrid.scrollTop;
-      }, SCROLL_GAP);
-      // this.dataGrid.scrollTop = 0;
-    },
-    scrollBottom() {
-      if (!this.dataGrid) {
-        return;
-      }
-      
-      let current = this.dataGrid.scrollTop;
-      const target = this.dataGrid.scrollHeight;
-      const velocity = Math.ceil((target - current) / SCROLL_TIME) * SCROLL_GAP;
-      const that = this;
-      this.scrollInterval = setInterval(() => {
-        console.log("bottom", that.dataGrid.scrollTop, target)
-        if (that.dataGrid.scrollTop >= target) {
-          that.clearTimerInterval()
-          return;
-        }
-        this.dataGrid.scrollTop = current + velocity;
-        current = this.dataGrid.scrollTop;
-      }, SCROLL_GAP);
-      setTimeout(this.clearTimerInterval, SCROLL_TIME)
-      // this.dataGrid.scrollTop = this.dataGrid.scrollHeight;
-    },
-    scrollTopFn () {},
-    scrollBottomFn () {},
     changeThreads () {
       this.loading = true;
       let {
@@ -248,10 +197,7 @@ export default defineComponent({
       </div>
     </div>
     <div class="thread-view__footer"></div>
-    <div class="scroll-btn">
-      <el-button type="primary" @click="scrollTopFn" circle :icon="ArrowUp" size="large"></el-button>
-      <el-button type="primary" @click="scrollBottomFn" circle :icon="ArrowDown" size="large"></el-button>
-    </div>
+    <arrow-buttons :element="dataGrid"></arrow-buttons>
   </div>
 </template>
 
@@ -276,16 +222,6 @@ $header-height: 40px;
   flex-direction: column;
   flex: 1;
   position: relative;
-  .scroll-btn {
-    position:absolute;
-    bottom: 30px;
-    right: 30px;
-    display: flex;
-    flex-direction: column;
-    button {
-      margin: 3px;
-    }
-  }
   .thread-view-filter__grid {
     display: grid;
     grid-template-columns: 320px 80px 150px 1fr;
@@ -424,7 +360,5 @@ $header-height: 40px;
       max-width: 500px;
     }
   }
-    
-    
 }
 </style>
