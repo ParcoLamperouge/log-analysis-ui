@@ -1,6 +1,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { ArrowUp, ArrowDown } from '@element-plus/icons-vue';
+function getElementHeight(selector: string): number {
+  const el = document.querySelector(selector) as HTMLElement;
+  return el.scrollHeight;
+}
 
 export default defineComponent({
   setup() {
@@ -29,15 +33,12 @@ export default defineComponent({
     },
     scrollBottomFn () {
       let target = this.element || window;
-      let body = this.element || document.querySelector('body');
       if (!target || !target.scrollTo) {
         return;
       }
-      if (!body || !body.scrollHeight) {
-        return;
-      }
+      const scrollHeight = getElementHeight('body');
       target.scrollTo({
-        top: body.scrollHeight,
+        top: scrollHeight,
         behavior: "smooth"
       });
     }
