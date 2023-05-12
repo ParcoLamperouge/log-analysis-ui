@@ -28,9 +28,12 @@ export default defineComponent({
       });
     },
     scrollBottomFn () {
-      let target = this.element.scrollTo ? this.element : window;
-      let body = this.element.scrollHeight ? this.element : document.querySelector('body');
-      if (!target || !body) {
+      let target = this.element || window;
+      let body = this.element || document.querySelector('body');
+      if (!target || !target.scrollTo) {
+        return;
+      }
+      if (!body || !body.scrollHeight) {
         return;
       }
       target.scrollTo({
