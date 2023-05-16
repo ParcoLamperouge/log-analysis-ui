@@ -3,9 +3,9 @@ import { ref } from 'vue';
 import { logDataStore, filterStore, viewStore } from "../../stores/mainStore"
 import { mapState } from "pinia";
 import { ViewTypes } from "../../utils/enum"
-import DropView from "../../views/DropView.vue"
+import DropZone from "../components/DropZone.vue"
 export default {
-  components: { DropView },
+  components: { DropZone },
   setup(){
     const insViewStore = viewStore();
     const insFilterStore = filterStore();
@@ -55,7 +55,7 @@ export default {
         />
       </el-select>
     </div>
-    <drop-view :size="'small'"></drop-view>
+    <drop-zone :size="'small'"></drop-zone>
   </div>
 </template>
 <style scoped lang="scss">
@@ -74,8 +74,6 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-  }
-  .view-selector > span {
   }
   .back-home {
     height: 40px;
