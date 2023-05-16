@@ -1,8 +1,23 @@
 import { extractData, generateGridData } from '../stringHandle';
 import { vi, it, expect, describe } from "vitest";
-import type { logDataItem } from '../../../class/logFile';
+import type { LogDataItem } from '../../../class/logFile';
 // dataArr
-const log1 = ['[20:53:29.134][I][XEApplication.cpp:72]: [XEApplication::InitContext][tid:39996] ---> 启动客户端程序，verison:3.1.14.0315\r', '[20:53:29.165][I][XEApp.cpp:272]: [XEApp::InitQApplication][tid:39996] ---> <<< [全局] 初始化QT环境开始\r', '[20:53:29.168][I][XEApp.cpp:313]: [XEApp::InitQApplication][tid:39996] ---> QT环境初始化完成.\r', '[20:53:29.168][I][XEApp.cpp:319]: [XEApp::InitQApplication][tid:39996] ---> <<< [全局] 初始化QT环境结束\r', '[20:53:29.168][I][XEApp.cpp:508]: [XEApp::InitFont][tid:39996] ---> <<< [全局] 初始化字体库开始\r', '[20:53:29.168][I][XEApp.cpp:519]: [XEApp::InitFont][tid:39996] ---> <<< [全局] 初始化字体库结束\r', '[20:53:29.173][I][XEApp.cpp:328]: [XEApp::InitQss][tid:39996] ---> <<< [全局] 初始化QSS样式表开始\r', '[20:53:29.181][I][XEApp.cpp:384]: [XEApp::InitQss][tid:39996] ---> <<< [全局] 初始化QSS样式表结束\r', '[20:53:29.181][I][XEApp.cpp:602]: [XEApp::InitLoca…esource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置开始\r', '[20:53:29.181][I][XEApp.cpp:611]: [XEApp::InitLoca…esource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置结束\r', '[20:53:29.182][I][XEApp.cpp:217]: [XEApp::InitContext][tid:39996] ---> <<< [全局] 初始化运行环境结束\r', '[20:53:29.183][I][XEApp.cpp:228]: [XEApp::RunApp][tid:39996] ---> <<< [全局] RunApp开始\r', '[20:53:29.183][I][XEBackend.cpp:68]: [XEBackend::Init][tid:39996] ---> 初始化后端服务完成.\r', '[20:53:29.186][I][XEBackend.cpp:743]: [XEBackend::TrainingLogin][tid:39996] ---> >>> 轮询登录态启动：\r'];
+const log1 = [
+  '[20:53:29.134][I][XEApplication.cpp:72]: [XEApplication::InitContext][tid:39996] ---> 启动客户端程序，verison:3.1.14.0315\r', 
+  '[20:53:29.165][I][XEApp.cpp:272]: [XEApp::InitQApplication][tid:39996] ---> <<< [全局] 初始化QT环境开始\r', 
+  '[20:53:29.168][I][XEApp.cpp:313]: [XEApp::InitQApplication][tid:39996] ---> QT环境初始化完成.\r', 
+  '[20:53:29.168][I][XEApp.cpp:319]: [XEApp::InitQApplication][tid:39996] ---> <<< [全局] 初始化QT环境结束\r', 
+  '[20:53:29.168][I][XEApp.cpp:508]: [XEApp::InitFont][tid:39996] ---> <<< [全局] 初始化字体库开始\r', 
+  '[20:53:29.168][I][XEApp.cpp:519]: [XEApp::InitFont][tid:39996] ---> <<< [全局] 初始化字体库结束\r', 
+  '[20:53:29.173][I][XEApp.cpp:328]: [XEApp::InitQss][tid:39996] ---> <<< [全局] 初始化QSS样式表开始\r', 
+  '[20:53:29.181][I][XEApp.cpp:384]: [XEApp::InitQss][tid:39996] ---> <<< [全局] 初始化QSS样式表结束\r', 
+  '[20:53:29.181][I][XEApp.cpp:602]: [XEApp::InitLoca…esource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置开始\r', 
+  '[20:53:29.181][I][XEApp.cpp:611]: [XEApp::InitLoca…esource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置结束\r', 
+  '[20:53:29.182][I][XEApp.cpp:217]: [XEApp::InitContext][tid:39996] ---> <<< [全局] 初始化运行环境结束\r', 
+  '[20:53:29.183][I][XEApp.cpp:228]: [XEApp::RunApp][tid:39996] ---> <<< [全局] RunApp开始\r', 
+  '[I][XEApp.cpp:228]: [XEApp::RunApp][tid:39996] ---> <<< 这是一条异常数据 没有时间戳\r', 
+  '[20:53:29.183][I][XEBackend.cpp:68]: [XEBackend::Init][tid:39996] ---> 初始化后端服务完成.\r',
+  '[20:53:29.186][I][XEBackend.cpp:743]: [XEBackend::TrainingLogin][tid:39996] ---> >>> 轮询登录态启动：\r'];
 const log2 = [
   '[20:53:29.134][I][XEApplication.cpp:72]: [XEApplication::InitContext][tid:39996] ---> 启动客户端程序，verison:3.1.14.0315\r', 
   '[20:53:29.165][I][XEApp.cpp:272]: [XEApp::InitQApplication][tid:39991] ---> <<< [全局] 初始化QT环境开始\r', 
@@ -12,11 +27,20 @@ const log2 = [
   '[20:53:29.168][I][XEApp.cpp:519]: [XEApp::InitFont][tid:39995] ---> <<< [全局] 初始化字体库结束\r', 
   '[20:53:29.173][I][XEApp.cpp:328]: [XEApp::InitQss][tid:39996] ---> <<< [全局] 初始化QSS样式表开始\r', 
   '[20:53:29.181][I][XEApp.cpp:384]: [XEApp::InitQss][tid:39997] ---> <<< [全局] 初始化QSS样式表结束\r', 
-  '[20:53:29.181][I][XEApp.cpp:602]: [XEApp::InitLocalSource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置开始\r', '[20:53:29.181][I][XEApp.cpp:611]: [XEApp::InitLoca…esource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置结束\r', '[20:53:29.182][I][XEApp.cpp:217]: [XEApp::InitContext][tid:39996] ---> <<< [全局] 初始化运行环境结束\r', 
+  '[20:53:29.181][I][XEApp.cpp:602]: [XEApp::InitLocalSource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置开始\r', 
+  '[20:53:29.181][I][XEApp.cpp:611]: [XEApp::InitLoca…esource][tid:39996] ---> <<< [全局] 初始化Web本地资源配置结束\r', 
+  '[20:53:29.182][I][XEApp.cpp:217]: [XEApp::InitContext][tid:39996] ---> <<< [全局] 初始化运行环境结束\r', 
   '[20:53:29.183][I][XEApp.cpp:228]: [XEApp::RunApp][tid:39996] ---> <<< [全局] RunApp开始\r', 
   '[20:53:29.183][I][XEBackend.cpp:68]: [XEBackend::Init][tid:39996] ---> 初始化后端服务完成.\r', 
   '[20:53:29.186][I][XEBackend.cpp:743]: [XEBackend::TrainingLogin][tid:39996] ---> >>> 轮询登录态启动：\r'
   ];
+
+const log3 = [
+  '[15:37:52.474][I][tid:0x10a5a2600][XEApp.cpp:456][InitLocalResource] ---> <<< [全局] 初始化Web本地资源配置开始',
+  '[15:37:52.474][I][tid:0x10a5a2600][XEApp.cpp:465][InitLocalResource] ---> <<< [全局] 初始化Web本地资源配置结束',
+  '[15:37:52.531][I][tid:0x7000102a3000]Loading up OpenGL on adapter ATI Technologies Inc. AMD Radeon Pro 5300 OpenGL Engine',
+  '[15:37:52.531][I][tid:0x7000102a3000]OpenGL loaded successfully, version 4.1 ATI-4.7.101, shading language 4.10'
+]
 const result1 = {
   sorted: '["39996","other"]',
   timeStampArray: ["20:53:29.134","20:53:29.165","20:53:29.168","20:53:29.173","20:53:29.181","20:53:29.182","20:53:29.183","20:53:29.186"],
@@ -27,8 +51,8 @@ const result2 = {
   timeStampArray: ["20:53:29.134","20:53:29.165","20:53:29.168","20:53:29.173","20:53:29.181","20:53:29.182","20:53:29.183","20:53:29.186"],
   timeStampArrayShow: ["20:53:29.165","20:53:29.168"]
 }
-let insArr1:logDataItem[] = [];
-let insArr2:logDataItem[] = [];
+let insArr1:LogDataItem[] = [];
+let insArr2:LogDataItem[] = [];
 let selectedThreads1:any[] = [];
 let selectedThreads2:any[] = [];
 describe('extractData', () => {
@@ -40,6 +64,8 @@ describe('extractData', () => {
     selectedThreads1 = Array.from(sorted.slice(0, 5))
     expect(arr[5].timestamp).toBe('20:53:29.168');
     expect(arr[5].threadID).toBe('39996');
+    
+    // 数据处理：输入输出长度 排除异常数据
     expect(arr.length).toBe(14);
     expect(JSON.stringify(sorted)).toBe(result1.sorted);
     expect(JSON.stringify(Array.from(timestampSet))).toBe(JSON.stringify(result1.timeStampArray))
@@ -56,6 +82,13 @@ describe('extractData', () => {
     expect(JSON.stringify(sorted)).toBe(result2.sorted);
     expect(JSON.stringify(Array.from(timestampSet))).toBe(JSON.stringify(result2.timeStampArray))
   })
+  it('log3', () => {
+    const {
+      arr
+    } = extractData(log3);
+    expect(arr[0].threadID).toBe('0x10a5a2600');
+    expect(arr[2].threadID).toBe('0x7000102a3000');
+  })
 });
 describe('generateGridData', () => {
   it('log1', () => {
@@ -68,7 +101,6 @@ describe('generateGridData', () => {
     );
     expect(Object.keys(output)[0]).toBe('20:53:29.134');
     expect(Object.keys(output)[7]).toBe('20:53:29.186');
-    
     const testObj = output['20:53:29.134']['39996'][0];console.log(testObj)
     expect(testObj.fileName).toBe('XEApplication.cpp');
     expect(testObj.level).toBe('I');
@@ -77,6 +109,7 @@ describe('generateGridData', () => {
     expect(testObj.text).toBe('启动客户端程序，verison:3.1.14.0315');
     expect(testObj.threadID).toBe("39996");
     expect(testObj.timestamp).toBe("20:53:29.134");
+    expect(timeStampArray.length).toBe(8);
     expect(JSON.stringify(timeStampArray)).toBe(JSON.stringify(result1.timeStampArray));
   });
   it('log2', () => {
@@ -101,6 +134,6 @@ describe('generateGridData', () => {
   })
 })
 
-// TODO 
+// TODO
 // 数据处理：同时正确识别 *.cpp / *.c文件
-// 数据处理：输入输出长度相同
+

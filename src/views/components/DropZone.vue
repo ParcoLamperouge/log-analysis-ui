@@ -1,6 +1,6 @@
 <script lang="ts">
 import { ref, nextTick} from "vue";
-import { logDataStore } from "../stores/mainStore";
+import { logDataStore } from "../../stores/mainStore";
 export default {
   props: {
     size: String
@@ -21,6 +21,7 @@ export default {
         nextTick(() => {
           let str = reader.result || '';
           logStore.setLogData(fileSelect.name, splitFileByLine(str.toString()));
+          
         })
       };
     }
@@ -62,8 +63,8 @@ export default {
     }
 
     return {dropActive,
-    fileDropped, dragEnter, dragLeave, dragOver,
-    getLog, splitFileByLine}
+      fileDropped, dragEnter, dragLeave, dragOver,
+      getLog, splitFileByLine}
   }
 }
 </script>
@@ -103,6 +104,19 @@ export default {
     .dropzone {
       border-radius: 20px;
       border: 3px dashed black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20%;
+      .file-btn {
+        margin-left: 10px;
+      }
+      > p.drop-file-here {
+        font-size: 30px;
+      }
+      &.active {
+        background-color: rgba(0, 0, 0, 0.2)
+      }
     }
     .dropzone > p.drop-file-here {
       font-size: 30px;

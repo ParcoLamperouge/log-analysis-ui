@@ -1,5 +1,5 @@
 import reg from './regExp';
-import { logDataItem } from '../../class/logFile';
+import { LogDataItem } from '../../class/logFile';
 import { getValFromProxy, deepClone } from "../../utils/tools";
 const MAIN_TEXT_SPLIT_KEY = '--->';
 // 匹配正则表达式，添加默认返回
@@ -30,9 +30,9 @@ export const removeRecognizedTag = (str:string) => {
 
 export const extractData:any = (dataArr:any[]) => {
   // 初始化线程名集合
-  const threadSet = new Set();
-  const timestampSet = new Set();
-  const arr = [];
+  const threadSet:Set<string> = new Set();
+  const timestampSet:Set<string> = new Set();
+  const arr: LogDataItem[] = [];
   for (let i = 0; i < dataArr.length; i++) {
     let str = dataArr[i];
     // 初始化正文
@@ -70,7 +70,7 @@ export const extractData:any = (dataArr:any[]) => {
     }
     
     const args =[timestamp, level, threadID, fileName, lineNum, methodName, mainText];
-    const item = new logDataItem(i, str, ...args);
+    const item = new LogDataItem(i, str, ...args);
     if (item.timestamp.length < 1) {
       continue;
     }
@@ -83,7 +83,7 @@ export const extractData:any = (dataArr:any[]) => {
   return { arr, sorted, timestampSet };
 };
 export const generateGridData:any = (
-    instanceArr:logDataItem[],
+    instanceArr:LogDataItem[],
     timeStampArray:any[],
     selectedThreads:any[]
   ) => {
@@ -116,7 +116,7 @@ export const generateGridData:any = (
     }
   }
   */
-  instanceArr.forEach((ins:logDataItem) => {
+  instanceArr.forEach((ins:LogDataItem) => {
     const timestamp = ins.timestamp;
     let threadID = ins.threadID;
     const curObj = rowMap[timestamp];

@@ -7,7 +7,7 @@ export class logFile {
 //     W: 'warning',
 //     E: 'error'
 // }
-export class logDataItem {
+export class LogDataItem {
     private id: number;
     private rawString: string;
     // private bgClass: string;

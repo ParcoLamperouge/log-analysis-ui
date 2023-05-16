@@ -2,7 +2,11 @@
 import { ref } from "vue";
 import { viewStore, logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
+import ArrowButtons from '../../views/components/ArrowButtons.vue';
 export default {
+  components: {
+    ArrowButtons
+  },
   setup() {
     const insLogStore = logDataStore();
     const insFilterStore = filterStore();
@@ -64,11 +68,13 @@ export default {
         {{ line }}
       </div>
     </div>
+    <arrow-buttons></arrow-buttons>
   </div>
 </template>
 
 <style scoped lang="scss">
 .text-view{
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100vh;

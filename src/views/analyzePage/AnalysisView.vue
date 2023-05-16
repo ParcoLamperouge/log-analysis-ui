@@ -5,13 +5,14 @@ import LogHeader from './ViewHeader.vue';
 import TextView from './TextView.vue';
 import ThreadView from './ThreadView.vue';
 import { mapState } from 'pinia';
+
 export default {
   components: {LogHeader, TextView, ThreadView},
   setup() {
     const insLogStore = logDataStore();
     let dataArray = ref<string[]>([]);
     return {
-      dataArray, insLogStore, 
+      dataArray, insLogStore
     }
   },
   mounted () {
@@ -42,7 +43,7 @@ export default {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .analyze{
   position: relative;
   display: flex;

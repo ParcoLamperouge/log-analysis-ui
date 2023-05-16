@@ -5,11 +5,16 @@ import { logDataStore, filterStore }from "../../stores/mainStore";
 import { mapState } from 'pinia';
 import { generateGridData, extractData } from './stringHandle';
 import { getValFromProxy } from "../../utils/tools"
-import OptionTab from '../../components/OptionTab.vue'
-
+import OptionTab from '../../views/OptionTab.vue'
+import ArrowButtons from '../../views/components/ArrowButtons.vue';
+import {
+  ArrowUp,
+  ArrowDown,
+} from '@element-plus/icons-vue'
 export default defineComponent({
-  components: {OptionTab},
+  components: { OptionTab, ArrowButtons },
   setup() {
+    const dataGrid = ref<any>(null);
     const isInit = ref(true);
     const showAlias = ref(false);
 
@@ -31,7 +36,7 @@ export default defineComponent({
     let timeStampArray = ref<any[]>([]);
     let allThreadIDArray = ref<string[]>([]);
     let drawData = ref<any>({});
-
+    
     return {
       isInit,
       showAlias,
@@ -44,7 +49,10 @@ export default defineComponent({
       timeStampArray,
       allThreadIDArray,
       drawData,
-      selectedThreads
+      selectedThreads,
+      dataGrid,
+      ArrowUp,
+      ArrowDown
     }
   },
   mounted () {
@@ -172,11 +180,11 @@ export default defineComponent({
     <div class="thread-view__header"  :style="`zoom: ${zoomSize/100}`">
       <div class="timestamp-left header-timestamp">时间戳</div>
       <div class="header-title header-thread" v-for="(thread, t) in selectedThreads" :key="t">
-        线程：{{thread}}
+        {{showAlias ? '' : "线程："}}{{thread}}
         <input class="header-thread-alias" v-show="showAlias" placeholder="输入别名"/>
       </div>
     </div>
-    <div class="thread-view__panel" v-loading="showLoading"  :style="`zoom: ${zoomSize/100}`">
+    <div class="thread-view__panel" v-loading="showLoading"  :style="`zoom: ${zoomSize/100}`" ref="dataGrid">
       <div class="row" v-for="(timestamp, i) in timeStampArray" :key="i">
         <div class="timestamp-left">{{timestamp}}</div>
         <div class="lines-right column" v-for="(lines, j) in drawData[timestamp]" :key="j">
@@ -189,6 +197,7 @@ export default defineComponent({
       </div>
     </div>
     <div class="thread-view__footer"></div>
+    <arrow-buttons :element="dataGrid"></arrow-buttons>
   </div>
 </template>
 
@@ -212,6 +221,7 @@ $header-height: 40px;
   display: flex;
   flex-direction: column;
   flex: 1;
+  position: relative;
   .thread-view-filter__grid {
     display: grid;
     grid-template-columns: 320px 80px 150px 1fr;
@@ -350,7 +360,5 @@ $header-height: 40px;
       max-width: 500px;
     }
   }
-    
-    
 }
 </style>
