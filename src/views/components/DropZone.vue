@@ -2,7 +2,7 @@
 import { nextTick} from "vue";
 import { logDataStore } from "@/stores/mainStore";
 import { ElNotification } from 'element-plus';
-import { logFileUpload } from '../../api/httpInterface.js';
+// import { logFileUpload } from '../../api/httpInterface.js';
 export default {
   props: {
     size: String
@@ -17,8 +17,8 @@ export default {
       ElNotification(errorOption);
       return;
     }
-    const logStore = logDataStore();
-    return {logStore}
+    const insLogStore = logDataStore();
+    return {insLogStore}
   },
   data () {
     return {
@@ -78,7 +78,7 @@ export default {
       let _formData:FormData = new FormData();
       _formData.append("file_name", fileObj.name);
       _formData.append("file", fileObj);
-      logFileUpload(_formData);
+      // logFileUpload(_formData);
     },
     // upload fromData to server
     fileHandle (fileSelect:File) { 
@@ -97,10 +97,11 @@ export default {
       }
       let reader = new FileReader();
       reader.readAsText(fileSelect, "utf-8");
+      const self = this;
       reader.onload = () => {
         nextTick(() => {
           let str = reader.result || '';
-          this.logStore.setLogData(fileSelect.name, this.splitFileByLine(str.toString()));
+          self.insLogStore.setLogData(fileSelect.name, self.splitFileByLine(str.toString()));
         })
       };
       // testFileApis(fileSelect);
