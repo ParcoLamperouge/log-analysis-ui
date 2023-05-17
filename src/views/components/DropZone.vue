@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ref, nextTick} from "vue";
+import { nextTick} from "vue";
 import { logDataStore } from "@/stores/mainStore";
 import { ElNotification } from 'element-plus';
 import { logFileUpload } from '../../api/httpInterface.js';
@@ -18,16 +18,70 @@ export default {
       return;
     }
     const logStore = logDataStore();
-    let dropActive = ref(false);
+    return {logStore}
+  },
+  data () {
+    return {
+      dropActive: false
+    }
+  },
+  mounted () {
 
-    // upload fromData to server
-    const submitFile = (fileObj:File) => {
+  },
+  methods: {
+    fileSelected (e:any) {
+      let file = e.target.files[0];
+      this.fileHandle(file);
+    },
+    fileDropped (e:any) {
+      e.stopPropagation();
+      e.preventDefault();
+      this.dropActive = false;
+      let file = e.dataTransfer.files[0];
+      this.fileHandle(file);
+    },
+    dragEnter (e:any) {
+      e.stopPropagation();
+      e.preventDefault();
+      this.dropActive = true;
+    },
+ 
+    dragLeave (e:any) {
+      e.stopPropagation();
+      e.preventDefault();
+      this.dropActive = false;
+    },
+    dragOver (e:any) {
+      e.stopPropagation();
+      e.preventDefault();
+      this.dropActive = true;
+    },
+
+    splitFileByLine (data:string): string[] {
+      const result:string[] = data.split("\n");
+      return result;
+    },
+    
+    testFileApis (file:File) {
+      // test
+      this.submitFile(file);
+      // split file by Blob 
+      let _sliceBlob = new Blob([file]).slice(0, 5000);
+      let _sliceFile = new File([_sliceBlob], "test.log");
+      let fr = new FileReader();
+      fr.readAsDataURL(_sliceFile);
+      fr.onload = function () {
+        console.log(fr.result);
+      };
+    },
+    submitFile (fileObj:File) {
       let _formData:FormData = new FormData();
       _formData.append("file_name", fileObj.name);
       _formData.append("file", fileObj);
       logFileUpload(_formData);
-    };
-    const fileHandle = (fileSelect:File) => { 
+    },
+    // upload fromData to server
+    fileHandle (fileSelect:File) { 
       const fileName:string = fileSelect.name;
       const fileType:string = fileSelect.type;
       // 仅支持log文件或者文本格式
@@ -46,62 +100,11 @@ export default {
       reader.onload = () => {
         nextTick(() => {
           let str = reader.result || '';
-          logStore.setLogData(fileSelect.name, splitFileByLine(str.toString()));
+          this.logStore.setLogData(fileSelect.name, this.splitFileByLine(str.toString()));
         })
       };
       // testFileApis(fileSelect);
     }
-    const fileSelected = (e:any) => {
-      let file = e.target.files[0];
-      fileHandle(file);
-    }
-    const fileDropped = (e:any) => {
-      e.stopPropagation();
-      e.preventDefault();
-      dropActive.value = false;
-      let file = e.dataTransfer.files[0];
-      fileHandle(file);
-    }
-    const dragEnter = (e:any) => {
-      e.stopPropagation();
-      e.preventDefault();
-      dropActive.value = true;
-    }
-    const dragLeave = (e:any) => {
-      e.stopPropagation();
-      e.preventDefault();
-      dropActive.value = false;
-    }
-    const dragOver = (e:any) => {
-      e.stopPropagation();
-      e.preventDefault();
-      dropActive.value = true;
-    }
-
-    const splitFileByLine = (data:string): string[] => {
-      const result:string[] = data.split("\n");
-      return result;
-    }
-    
-    const testFileApis = (file:File) => {
-      // test
-      submitFile(file);
-      // split file by Blob 
-      let _sliceBlob = new Blob([file]).slice(0, 5000);
-      let _sliceFile = new File([_sliceBlob], "test.log");
-      let fr = new FileReader();
-      fr.readAsDataURL(_sliceFile);
-      fr.onload = function () {
-        console.log(fr.result);
-      };
-    }
-
-    return {dropActive,
-      fileSelected, fileDropped, dragEnter, dragLeave, dragOver,
-      fileHandle}
-  },
-  methods: {
-    
   }
 }
 </script>
