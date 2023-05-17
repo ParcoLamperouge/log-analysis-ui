@@ -6,10 +6,6 @@ import DropZone from "./components/DropZone.vue"
 export default {
   components: { AnalyzePage, DropZone },
   setup() {
-    const insLogStore = logDataStore();
-    return {
-      insLogStore
-    }
   },
   
   computed: {

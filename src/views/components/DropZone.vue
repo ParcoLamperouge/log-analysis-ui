@@ -17,16 +17,14 @@ export default {
       ElNotification(errorOption);
       return;
     }
-    const insLogStore = logDataStore();
-    return {insLogStore}
   },
   data () {
     return {
-      dropActive: false
+      dropActive: false,
+      insLogStore: logDataStore()
     }
   },
   mounted () {
-
   },
   methods: {
     fileSelected (e:any) {
