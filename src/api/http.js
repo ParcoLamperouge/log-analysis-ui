@@ -1,9 +1,8 @@
 import axios from 'axios';
 const OK = 200;
-const handleResponse = function (promise, url = '') {
+const handleResponse = function (promise) {
   return new Promise((resolve, reject) => {
     const response = {
-      url: url,
       msg: '',
       code: 0
     };
@@ -44,10 +43,10 @@ class Http {
     this.axios = axios.create();
   }
   get (url, params = {}){
-    return handleResponse(this.axios.get(url, {params}), url);
+    return handleResponse(this.axios.get(url, {params}));
   }
   post (url, params = {}){
-    return handleResponse(this.axios.post(url, params), url);
+    return handleResponse(this.axios.post(url, params));
   }
 }
 export default Http;

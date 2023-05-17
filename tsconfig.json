@@ -13,6 +13,9 @@
   ],
   "compilerOptions": {
     "allowJs": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   }
 }

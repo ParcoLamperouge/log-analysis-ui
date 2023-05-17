@@ -6,8 +6,8 @@ const hello = async () => {
   return result;
 }
 
-const logFileUpload = async () => {
-  const result = await logServer.post("logServer/logFileUpload", {});
+const logFileUpload = async (formData) => {
+  const result = await logServer.post("logServer/logFileUpload", formData);
   return result;
 }
 export {

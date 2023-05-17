@@ -1,36 +1,72 @@
 <script lang="ts">
 import { ref, nextTick} from "vue";
-import { logDataStore } from "../../stores/mainStore";
+import { logDataStore } from "@/stores/mainStore";
+import { ElNotification } from 'element-plus';
+import { logFileUpload } from '@/api/httpInterface.js';
 export default {
   props: {
     size: String
   },
   setup() {
+    if (typeof FileReader === 'undefined') {
+      const errorOption:any = {
+        title: `你的浏览器不支持，我推荐你用Chrome`,
+        type: 'error',
+        "show-close": false
+      }
+      ElNotification(errorOption);
+      return;
+    }
     const logStore = logDataStore();
     let dropActive = ref(false);
-    const fileDropped = (e:any) => {
-      e.stopPropagation();
-      e.preventDefault();
-      dropActive.value = false;
-      let fileData = e;
-      console.log("fileDropped", fileData);
-      let fileSelect = e.dataTransfer.files[0];
+
+    // upload fromData to server
+    const submitFile = (fileObj:File) => {
+      let _formData:FormData = new FormData();
+      _formData.append("file_name", fileObj.name);
+      _formData.append("file", fileObj);
+      logFileUpload(_formData);
+    };
+    const fileHandle = (fileSelect:File) => { 
+      const fileName:string = fileSelect.name;
+      const fileType:string = fileSelect.type;
+      // 仅支持log文件或者文本格式
+      const isTextFile:Boolean = fileName.endsWith(".log") || /^text\//.test(fileType);
+      if (!isTextFile) {
+        const option:any = {
+          title: `文件"${fileSelect.name}"类型错误，请重新选择`,
+          type: 'warning',
+          'show-close': false
+        }
+        ElNotification(option);
+        return;
+      }
       let reader = new FileReader();
       reader.readAsText(fileSelect, "utf-8");
       reader.onload = () => {
         nextTick(() => {
           let str = reader.result || '';
           logStore.setLogData(fileSelect.name, splitFileByLine(str.toString()));
-          
         })
       };
+      // testFileApis(fileSelect);
+    }
+    const fileSelected = (e:any) => {
+      let fileSelected = e.target.files[0];
+      fileHandle(fileSelected);
+    }
+    const fileDropped = (e:any) => {
+      e.stopPropagation();
+      e.preventDefault();
+      dropActive.value = false;
+      let fileDropped = e.dataTransfer.files[0];
+      fileHandle(fileDropped);
     }
     const dragEnter = (e:any) => {
       e.stopPropagation();
       e.preventDefault();
       dropActive.value = true;
     }
-
     const dragLeave = (e:any) => {
       e.stopPropagation();
       e.preventDefault();
@@ -41,30 +77,31 @@ export default {
       e.preventDefault();
       dropActive.value = true;
     }
-    const getLog = (e:any) => {
-      if (typeof FileReader === 'undefined') {
-        new Error("浏览器不支持，赶紧换Chrome吧球球了");
-        return;
-      }
-      let fileSelect = e.target.files[0];
-      let reader = new FileReader();
-      reader.readAsText(fileSelect, "utf-8");
-      reader.onload = () => {
-        nextTick(() => {
-          let str = reader.result || '';
-          logStore.setLogData(fileSelect.name, splitFileByLine(str.toString()));
-        })
-      };
-    }
 
     const splitFileByLine = (data:string): string[] => {
       const result:string[] = data.split("\n");
       return result;
     }
+    
+    const testFileApis = (file:File) => {
+      // test
+      submitFile(file);
+      // split file by Blob 
+      let _sliceBlob = new Blob([file]).slice(0, 5000);
+      let _sliceFile = new File([_sliceBlob], "test.log");
+      let fr = new FileReader();
+      fr.readAsDataURL(_sliceFile);
+      fr.onload = function () {
+        console.log(fr.result);
+      };
+    }
 
     return {dropActive,
-      fileDropped, dragEnter, dragLeave, dragOver,
-      getLog, splitFileByLine}
+      fileSelected, fileDropped, dragEnter, dragLeave, dragOver,
+      fileHandle}
+  },
+  methods: {
+    
   }
 }
 </script>
@@ -77,7 +114,7 @@ export default {
       @dragleave="dragLeave"
       @dragover="dragOver">
       <p class="drop-file-here" >拖拽日志文件到此处, 或者点击</p>
-      <input type="file" ref="fileBtn" accept=".log" class="file-btn" @change="getLog"/>
+      <input type="file" ref="fileBtn" accept=".log" class="file-btn" @change="fileSelected"/>
     </div> 
   </div>
 </template>

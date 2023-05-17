@@ -1,6 +1,6 @@
 import reg from './regExp';
 import { LogDataItem } from '../../class/logFile';
-import { getValFromProxy, deepClone } from "../../utils/tools";
+import { getValFromProxy, deepClone } from "@/utils/tools";
 const MAIN_TEXT_SPLIT_KEY = '--->';
 // 匹配正则表达式，添加默认返回
 export const matchRegExp = (str:string, reg:RegExp, defaultVal:any = "") => {

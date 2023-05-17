@@ -1,6 +1,6 @@
 <script lang="ts">
 import { ref } from "vue";
-import { logDataStore, viewStore }from "../../stores/mainStore";
+import { logDataStore, viewStore }from "@/stores/mainStore";
 import LogHeader from './ViewHeader.vue';
 import TextView from './TextView.vue';
 import ThreadView from './ThreadView.vue';

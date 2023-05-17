@@ -1,12 +1,12 @@
 <script lang="ts">
 import { ref, defineComponent} from "vue";
 import { ElNotification } from 'element-plus';
-import { logDataStore, filterStore }from "../../stores/mainStore";
+import { logDataStore, filterStore }from "@/stores/mainStore";
 import { mapState } from 'pinia';
 import { generateGridData, extractData } from './stringHandle';
-import { getValFromProxy } from "../../utils/tools"
-import OptionTab from '../../views/OptionTab.vue'
-import ArrowButtons from '../../views/components/ArrowButtons.vue';
+import { getValFromProxy } from "@/utils/tools"
+import OptionTab from '@/views/OptionTab.vue'
+import ArrowButtons from '@/views/components/ArrowButtons.vue';
 import {
   ArrowUp,
   ArrowDown,

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { ref } from "vue";
-import { filterStore }from "../stores/mainStore";
+import { filterStore }from "@/stores/mainStore";
 
 export default {
   props: {

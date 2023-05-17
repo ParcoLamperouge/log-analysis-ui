@@ -1,8 +1,8 @@
 <script lang="ts">
 import { ref } from "vue";
-import { viewStore, logDataStore, filterStore }from "../../stores/mainStore";
+import { viewStore, logDataStore, filterStore }from "@/stores/mainStore";
 import { mapState } from 'pinia';
-import ArrowButtons from '../../views/components/ArrowButtons.vue';
+import ArrowButtons from '@/views/components/ArrowButtons.vue';
 export default {
   components: {
     ArrowButtons

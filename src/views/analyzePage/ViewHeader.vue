@@ -1,8 +1,8 @@
 <script lang="ts">
 import { ref } from 'vue';
-import { logDataStore, filterStore, viewStore } from "../../stores/mainStore"
+import { logDataStore, filterStore, viewStore } from "@/stores/mainStore"
 import { mapState } from "pinia";
-import { ViewTypes } from "../../utils/enum"
+import { ViewTypes } from "@/utils/enum"
 import DropZone from "../components/DropZone.vue"
 export default {
   components: { DropZone },
