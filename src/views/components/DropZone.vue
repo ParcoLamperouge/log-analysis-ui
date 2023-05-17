@@ -2,7 +2,7 @@
 import { ref, nextTick} from "vue";
 import { logDataStore } from "@/stores/mainStore";
 import { ElNotification } from 'element-plus';
-import { logFileUpload } from '@/api/httpInterface.js';
+import { logFileUpload } from '../../api/httpInterface.js';
 export default {
   props: {
     size: String
@@ -52,15 +52,15 @@ export default {
       // testFileApis(fileSelect);
     }
     const fileSelected = (e:any) => {
-      let fileSelected = e.target.files[0];
-      fileHandle(fileSelected);
+      let file = e.target.files[0];
+      fileHandle(file);
     }
     const fileDropped = (e:any) => {
       e.stopPropagation();
       e.preventDefault();
       dropActive.value = false;
-      let fileDropped = e.dataTransfer.files[0];
-      fileHandle(fileDropped);
+      let file = e.dataTransfer.files[0];
+      fileHandle(file);
     }
     const dragEnter = (e:any) => {
       e.stopPropagation();
